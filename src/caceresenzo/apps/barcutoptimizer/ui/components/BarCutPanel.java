@@ -1,0 +1,92 @@
+package caceresenzo.apps.barcutoptimizer.ui.components;
+
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
+import java.util.List;
+
+import javax.swing.JPanel;
+
+import caceresenzo.apps.barcutoptimizer.models.Cut;
+import caceresenzo.apps.barcutoptimizer.models.CutGroup;
+import caceresenzo.libs.list.ListUtils;
+import javax.swing.border.TitledBorder;
+
+public class BarCutPanel extends JPanel {
+	
+	private final CutGroup cutGroup;
+	
+	/**
+	 * Create the panel.
+	 */
+	public BarCutPanel(CutGroup cutGroup) {
+		setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		this.cutGroup = cutGroup;
+	}
+	
+	@Override
+	public void paint(Graphics graphics) {
+		super.paint(graphics);
+		
+		if (cutGroup == null) {
+			return;
+		}
+		
+		Graphics2D graphics2d = (Graphics2D) graphics;
+		
+		int startX = 2;
+		int startY = 2;
+		int maxWidth = getWidth() - startX;
+		int maxHeight = getHeight() - startY;
+		
+		double widthRatio = maxWidth / cutGroup.getBarLength();
+		
+		graphics2d.setColor(Color.RED);
+		graphics2d.fillRect(startX, startY, maxWidth - startX, maxHeight - startY);
+		
+		List<Cut> cuts = cutGroup.getCuts();
+		Cut lastCutElement = ListUtils.getLastestItem(cuts);
+		int eatedLength = 0;
+		for (int index = 0; index < cuts.size(); index++) {
+			Cut cut = cuts.get(index);
+			boolean isLast = cut == lastCutElement;
+			
+			int x1 = (int) (eatedLength * widthRatio) + startX;
+			int x2 = (int) ((eatedLength += cut.getLength()) * widthRatio) + startX;
+			
+			int angleOffset = 15;
+			int leftOffset = 0, rightOffset = 0;
+			
+			graphics2d.setColor(index % 2 == 0 ? Color.GRAY : Color.LIGHT_GRAY);
+			
+			if (cut.getCutAngleA() == 45) {
+				leftOffset = angleOffset;
+				
+				graphics2d.fillPolygon(new int[] { x1, x1 + angleOffset, x1 + angleOffset }, new int[] { maxHeight, maxHeight, startY }, 3);
+			}
+			
+			if (cut.getCutAngleB() == 45) {
+				rightOffset = angleOffset;
+				
+				graphics2d.fillPolygon(new int[] { x2, x2 - angleOffset, x2 - angleOffset }, new int[] { maxHeight, maxHeight, startY }, 3);
+			}
+			
+			graphics2d.fillRect(x1 + leftOffset, startY, x2 - x1 - leftOffset - rightOffset, maxHeight - startY);
+			
+			graphics2d.setColor(Color.BLACK);
+			String lengthText = String.valueOf(cut.getLength());
+			Rectangle2D stringBound = graphics2d.getFontMetrics().getStringBounds(lengthText, null);
+			graphics2d.drawString(lengthText, ((x2 - x1) / 2) - ((int) stringBound.getWidth() / 2) + x1, ((int) stringBound.getHeight() + maxHeight) / 2);
+			
+			if (!isLast) {
+				int spaceBetweenElement = 8;
+				eatedLength += spaceBetweenElement;
+				
+				graphics2d.setColor(Color.WHITE);
+				graphics2d.fillRect(x2, startY, (int) (spaceBetweenElement * widthRatio), maxHeight - startY);
+			}
+		}
+	}
+	
+}

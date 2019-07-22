@@ -1,0 +1,408 @@
+package caceresenzo.apps.barcutoptimizer.ui.windows;
+
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.swing.BoxLayout;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTree;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeWillExpandListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.ExpandVetoException;
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
+
+import caceresenzo.apps.barcutoptimizer.assets.Assets;
+import caceresenzo.apps.barcutoptimizer.config.Constants;
+import caceresenzo.apps.barcutoptimizer.models.BarReference;
+import caceresenzo.apps.barcutoptimizer.models.Cut;
+import caceresenzo.apps.barcutoptimizer.models.CutGroup;
+import caceresenzo.apps.barcutoptimizer.ui.components.CutGroupPanel;
+import caceresenzo.libs.internationalization.i18n;
+
+public class EditorWindow implements Constants {
+	
+	private JFrame frame;
+	private DefaultMutableTreeNode rootNode;
+	
+	private List<BarReference> barReferences;
+	private JPanel cutGroupListContainerPanel;
+	private JScrollPane cutGroupListScrollPanel;
+	private JButton addNewBarReferenceButton;
+	
+	public static void main(String[] args) {
+		BarReference dummy1 = new BarReference("hello", new ArrayList<>());
+		
+		dummy1.getCutGroups().add(new CutGroup(6500.0d, 0.0d, Arrays.asList(Cut.dummy(500, 45, 45))));
+		dummy1.getCutGroups().add(new CutGroup(6500.0d, 0.0d, Arrays.asList(Cut.dummy(500, 90, 45))));
+		dummy1.getCutGroups().add(new CutGroup(6500.0d, 0.0d, Arrays.asList(Cut.dummy(500, 90, 90))));
+		dummy1.getCutGroups().add(new CutGroup(6500.0d, 0.0d, Arrays.asList(Cut.dummy(500, 45, 90))));
+		
+		open(Arrays.asList(dummy1));
+	}
+	
+	/**
+	 * Create the application.
+	 */
+	public EditorWindow(List<BarReference> barReferences) {
+		this.barReferences = barReferences;
+		
+		initialize();
+	}
+	
+	/**
+	 * Initialize the contents of the frame.
+	 */
+	private void initialize() {
+		frame = new JFrame();
+		frame.setSize(689, 440);
+		frame.setMinimumSize(new Dimension(800, 500));
+		frame.setLocationRelativeTo(null);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setTitle(i18n.string("application.title"));
+		
+		JScrollPane treeScrollPanel = new JScrollPane();
+		treeScrollPanel.setViewportBorder(null);
+		
+		cutGroupListScrollPanel = new JScrollPane();
+		
+		addNewBarReferenceButton = new JButton(i18n.string("editor.button.add-new-bar-reference"));
+		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
+		groupLayout.setHorizontalGroup(
+				groupLayout.createParallelGroup(Alignment.LEADING)
+						.addGroup(groupLayout.createSequentialGroup()
+								.addContainerGap()
+								.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+										.addComponent(addNewBarReferenceButton, GroupLayout.PREFERRED_SIZE, 247, GroupLayout.PREFERRED_SIZE)
+										.addComponent(treeScrollPanel, GroupLayout.PREFERRED_SIZE, 247, GroupLayout.PREFERRED_SIZE))
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(cutGroupListScrollPanel, GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE)
+								.addContainerGap()));
+		groupLayout.setVerticalGroup(
+				groupLayout.createParallelGroup(Alignment.LEADING)
+						.addGroup(groupLayout.createSequentialGroup()
+								.addContainerGap()
+								.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+										.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+												.addComponent(treeScrollPanel, GroupLayout.DEFAULT_SIZE, 390, Short.MAX_VALUE)
+												.addPreferredGap(ComponentPlacement.RELATED)
+												.addComponent(addNewBarReferenceButton, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE))
+										.addComponent(cutGroupListScrollPanel, GroupLayout.DEFAULT_SIZE, 435, Short.MAX_VALUE))
+								.addContainerGap()));
+		
+		cutGroupListContainerPanel = new JPanel();
+		cutGroupListScrollPanel.setViewportView(cutGroupListContainerPanel);
+		cutGroupListContainerPanel.setLayout(new BoxLayout(cutGroupListContainerPanel, BoxLayout.Y_AXIS));
+		
+		cutGroupListScrollPanel.getVerticalScrollBar().setUnitIncrement(20);
+		
+		rootNode = new DefaultMutableTreeNode(i18n.string("editor.tree.root"));
+		JTree tree = new JTree(rootNode);
+		tree.setBorder(null);
+		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+		tree.setCellRenderer(new DefaultTreeCellRenderer() {
+			public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+				JLabel label = (JLabel) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+				
+				if (value instanceof DefaultMutableTreeNode) {
+					DefaultMutableTreeNode defaultMutableTreeNode = (DefaultMutableTreeNode) value;
+					Object object = defaultMutableTreeNode.getUserObject();
+					
+					if (object instanceof BarReference) {
+						BarReference barReference = (BarReference) object;
+						
+						label.setText(i18n.string("editor.tree.item.bar-reference.format", barReference.getName()));
+					}
+					
+					if (object instanceof CutGroup) {
+						CutGroup cutGroup = (CutGroup) object;
+						
+						label.setText(i18n.string("editor.tree.item.cut-group.format", cutGroup.getBarLength(), cutGroup.getCutCount()));
+					}
+					
+					if (object instanceof Cut) {
+						Cut cut = (Cut) object;
+						
+						label.setText(i18n.string("editor.tree.item.cut.format", cut.getLength(), cut.getCutAngleA(), cut.getCutAngleB()));
+					}
+				}
+				
+				return label;
+			};
+		});
+		tree.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent event) {
+				TreePath treePath = tree.getPathForLocation(event.getX(), event.getY());
+				
+				if (treePath != null) {
+					DefaultMutableTreeNode defaultMutableTreeNode = (DefaultMutableTreeNode) treePath.getLastPathComponent();
+					
+					displayNodeContent(defaultMutableTreeNode);
+					
+					if (event.getButton() == MouseEvent.BUTTON3) {
+						createTreePopupMenu(event);
+					}
+				} else {
+					clearDisplaySection();
+				}
+			}
+		});
+		
+		treeScrollPanel.setViewportView(tree);
+		frame.getContentPane().setLayout(groupLayout);
+		
+		createTreeNodes();
+		expandAllNodes(tree, 0, tree.getRowCount(), false);
+		
+		tree.addTreeWillExpandListener(new TreeWillExpandListener() {
+			@Override
+			public void treeWillExpand(TreeExpansionEvent event) throws ExpandVetoException {
+				;
+			}
+			
+			@Override
+			public void treeWillCollapse(TreeExpansionEvent event) throws ExpandVetoException {
+				TreePath path = event.getPath();
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+				Object userObject = node.getUserObject();
+				
+				if (userObject instanceof CutGroup || userObject instanceof BarReference) {
+					return;
+				}
+				
+				throw new ExpandVetoException(event, "Collapsing tree not allowed");
+			}
+		});
+		
+		if (!barReferences.isEmpty()) {
+			displayBarReference(barReferences.get(0));
+		}
+		
+		frame.pack();
+	}
+	
+	private void createTreeNodes() {
+		rootNode.removeAllChildren();
+		
+		for (BarReference barReference : barReferences) {
+			DefaultMutableTreeNode barReferenceNode = new DefaultMutableTreeNode(barReference);
+			
+			for (CutGroup cutGroup : barReference.getCutGroups()) {
+				DefaultMutableTreeNode cutGroupNode = new DefaultMutableTreeNode(cutGroup);
+				
+				if (SHOW_CUTS_IN_EDITOR_TREE) {
+					for (Cut cut : cutGroup.getCuts()) {
+						DefaultMutableTreeNode cutNode = new DefaultMutableTreeNode(cut);
+						
+						cutGroupNode.add(cutNode);
+					}
+				}
+				
+				barReferenceNode.add(cutGroupNode);
+			}
+			
+			rootNode.add(barReferenceNode);
+		}
+	}
+	
+	private void expandAllNodes(JTree tree, int startingIndex, int rowCount, boolean recursive) {
+		for (int i = startingIndex; i < rowCount; ++i) {
+			tree.expandRow(i);
+		}
+		
+		if (recursive) {
+			if (tree.getRowCount() != rowCount) {
+				expandAllNodes(tree, rowCount, tree.getRowCount(), recursive);
+			}
+		}
+	}
+	
+	private void displayNodeContent(DefaultMutableTreeNode defaultMutableTreeNode) {
+		clearDisplaySection();
+		
+		Object userObject = defaultMutableTreeNode.getUserObject();
+		CutGroup cutGroup = null;
+		
+		if (userObject instanceof CutGroup) {
+			cutGroup = (CutGroup) userObject;
+			
+			userObject = ((DefaultMutableTreeNode) defaultMutableTreeNode.getParent()).getUserObject();
+		}
+		
+		if (userObject instanceof BarReference) {
+			displayBarReference((BarReference) userObject);
+		}
+		
+		if (cutGroup != null) {
+			scrollToCutGroup(cutGroup);
+		}
+		
+		System.out.println(defaultMutableTreeNode);
+	}
+	
+	private void displayBarReference(BarReference barReference) {
+		clearDisplaySection();
+		
+		barReference.getCutGroups().forEach((cutGroup) -> cutGroupListContainerPanel.add(new CutGroupPanel(cutGroup)));
+		
+		System.out.println("Opening: " + barReference);
+		
+		cutGroupListScrollPanel.updateUI();
+		// frame.pack();
+	}
+	
+	private void scrollToCutGroup(CutGroup cutGroup) {
+		Component[] components = cutGroupListContainerPanel.getComponents();
+		CutGroupPanel cutGroupPanel = null;
+		
+		for (int i = 0; i < components.length; i++) {
+			Component component = components[i];
+			
+			if (!(component instanceof CutGroupPanel)) {
+				continue;
+			}
+			
+			if (((CutGroupPanel) component).getCutGroup().equals(cutGroup)) {
+				cutGroupPanel = (CutGroupPanel) component;
+				break;
+			}
+		}
+		
+		if (cutGroupPanel == null) {
+			System.out.println("No cutGroupPanel found for cut group: " + cutGroup);
+			return;
+		}
+		
+		// Rectangle bounds = cutGroupPanel.getBounds();
+		// bounds.setLocation(SwingUtilities.convertPoint(cutGroupPanel, bounds.getPoint(), topLevelParentPaneInScrollPane));
+		// cutGroupListScrollPanel.getViewport().scrollRectToVisible(cutGroupPanel.getBounds());
+		// cutGroupListScrollPanel.getVerticalScrollBar().setValue(cutGroupPanel.getLocation().y - 50);
+		// System.out.println("Scrolling to Y: " + (cutGroupPanel.getLocation().y - 50));
+	}
+	
+	private void clearDisplaySection() {
+		cutGroupListContainerPanel.removeAll();
+		cutGroupListContainerPanel.revalidate();
+		cutGroupListContainerPanel.repaint();
+	}
+	
+	private void createTreePopupMenu(MouseEvent event) {
+		int x = event.getX();
+		int y = event.getY();
+		
+		JTree tree = (JTree) event.getSource();
+		TreePath path = tree.getPathForLocation(x, y);
+		
+		if (path == null) {
+			return;
+		}
+		
+		tree.setSelectionPath(path);
+		
+		JPopupMenu popup = new JPopupMenu();
+		
+		DefaultMutableTreeNode defaultMutableTreeNode = (DefaultMutableTreeNode) path.getLastPathComponent();
+		Object userObject = defaultMutableTreeNode.getUserObject();
+		
+		if (rootNode.equals(defaultMutableTreeNode)) {
+			JMenuItem emptyMenuItem = new JMenuItem("Tout vider", new ImageIcon(EditorWindow.class.getResource(Assets.ICON_SHREDDER_SMALL)));
+			emptyMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent event) {
+					barReferences.clear();
+					
+					rootNode.removeAllChildren();
+					((DefaultTreeModel) tree.getModel()).reload(rootNode);
+				}
+			});
+			
+			popup.add(emptyMenuItem);
+		} else {
+			CutGroup cutGroup = null;
+			BarReference barReference = null;
+			
+			if (userObject instanceof CutGroup) {
+				cutGroup = (CutGroup) userObject;
+				
+				userObject = ((DefaultMutableTreeNode) defaultMutableTreeNode.getParent()).getUserObject();
+			}
+			
+			if (userObject instanceof BarReference) {
+				barReference = (BarReference) userObject;
+			}
+			
+			if (barReference == null) {
+				return;
+			}
+			
+			final CutGroup finalCutGroup = cutGroup;
+			final BarReference finalBarReference = barReference;
+			
+			JMenuItem deleteMenuItem = new JMenuItem("Supprimer ?", new ImageIcon(EditorWindow.class.getResource(Assets.ICON_DELETE_SMALL)));
+			deleteMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent event) {
+					TreeNode nodeToReload;
+					
+					if (finalCutGroup != null) {
+						finalBarReference.getCutGroups().remove(finalCutGroup);
+						
+						nodeToReload = defaultMutableTreeNode.getParent();
+					} else {
+						barReferences.remove(finalBarReference);
+						
+						nodeToReload = rootNode;
+					}
+					
+					((MutableTreeNode) nodeToReload).remove(defaultMutableTreeNode);
+					((DefaultTreeModel) tree.getModel()).reload(nodeToReload);
+				}
+			});
+			
+			popup.add(deleteMenuItem);
+		}
+		
+		popup.show(tree, x, y);
+	}
+	
+	public JFrame getFrame() {
+		return frame;
+	}
+	
+	public static final EditorWindow open(List<BarReference> barReferences) {
+		EditorWindow window = new EditorWindow(barReferences);
+		window.frame.setVisible(true);
+		
+		return window;
+	}
+	
+	public JPanel getCutGroupListContainerPanel() {
+		return cutGroupListContainerPanel;
+	}
+	
+	public JScrollPane getCutGroupListScrollPanel() {
+		return cutGroupListScrollPanel;
+	}
+}
