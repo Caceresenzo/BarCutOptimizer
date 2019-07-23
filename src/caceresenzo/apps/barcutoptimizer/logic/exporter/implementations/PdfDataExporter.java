@@ -34,6 +34,7 @@ import caceresenzo.apps.barcutoptimizer.models.CutTableInput;
 import caceresenzo.apps.barcutoptimizer.models.UnoptimizedCutList;
 import caceresenzo.apps.barcutoptimizer.ui.components.BarCutPanel;
 import caceresenzo.libs.filesystem.FileUtils;
+import caceresenzo.libs.logger.Logger;
 import caceresenzo.libs.random.Randomizer;
 import caceresenzo.libs.string.StringUtils;
 
@@ -49,7 +50,8 @@ public class PdfDataExporter implements DataExporter {
 	
 	public static final int SPACE_BETWEEN_COLUMN = (int) (PAGE_MARGIN_HORIZONTAL * 3);
 	
-	public static final int FONT_SIZE = 16;
+	public static final int FONT_SIZE = 12;
+	public static final int FONT_SIZE_WITH_NEW_LINE = FONT_SIZE + 4;
 	
 	/* Variables */
 	private PDDocument document;
@@ -87,7 +89,6 @@ public class PdfDataExporter implements DataExporter {
 					
 					if (!haveEnoughSpace(cutGroup, currentY, maxY)) {
 						iterator.previous();
-						
 						break;
 					}
 					
@@ -100,17 +101,13 @@ public class PdfDataExporter implements DataExporter {
 						
 						try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, false)) {
 							if (localIndex == 0) {
-								contentStream.beginText();
-								contentStream.setFont(font, (float) (FONT_SIZE * 1.5));
-								contentStream.setLeading(14.5f);
-								contentStream.newLineAtOffset(PAGE_MARGIN_HORIZONTAL, mediaBox.getHeight() - PAGE_MARGIN_VERTICAL - FONT_SIZE);
-								contentStream.showText("REF. " + barReference.getName());
-								contentStream.endText();
+								printHeader(contentStream, mediaBox, barReference);
+								printFooter(contentStream, mediaBox);
 								
 								currentY += FONT_SIZE * 2;
 							}
 							
-							currentY += BAR_CUT_IMAGE_HEIGHT;
+							currentY += BAR_CUT_IMAGE_HEIGHT + (FONT_SIZE);
 							float inversedY = mediaBox.getHeight() - currentY;
 							
 							contentStream.drawImage(pdImage, PAGE_MARGIN_HORIZONTAL, inversedY, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL * 2, (int) BAR_CUT_IMAGE_HEIGHT);
@@ -128,14 +125,14 @@ public class PdfDataExporter implements DataExporter {
 							contentStream.lineTo(mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, (float) (inversedY - (FONT_SIZE * 1.4)));
 							contentStream.stroke();
 							
-							contentStream.moveTo((float) ((PAGE_MARGIN_HORIZONTAL + SPACE_BETWEEN_COLUMN) * 0.91), (float) (inversedY - 5));
-							contentStream.lineTo((float) ((PAGE_MARGIN_HORIZONTAL + SPACE_BETWEEN_COLUMN) * 0.91), (float) (inversedY - usedY + 10));
+							contentStream.moveTo((float) ((PAGE_MARGIN_HORIZONTAL + SPACE_BETWEEN_COLUMN) * 0.91), (float) (inversedY));
+							contentStream.lineTo((float) ((PAGE_MARGIN_HORIZONTAL + SPACE_BETWEEN_COLUMN) * 0.91), (float) (inversedY - usedY));
 							contentStream.stroke();
 							
 							currentY += usedY;
 						}
 						
-						System.out.println("Image inserted at Y " + currentY + ": " + cutGroupFile.getAbsolutePath());
+						Logger.info("Y: %-4s -> inserted image: %s", currentY, cutGroupFile.getPath());
 					} catch (Exception exception) {
 						exception.printStackTrace();
 					}
@@ -155,6 +152,27 @@ public class PdfDataExporter implements DataExporter {
 		cleanUpTemporaryFiles();
 		
 		Runtime.getRuntime().exec("cmd /c " + new File(tempFolder, "exported.pdf").getAbsolutePath());
+	}
+	
+	private void printHeader(PDPageContentStream contentStream, PDRectangle mediaBox, BarReference barReference) throws IOException {
+		printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL, mediaBox.getHeight() - PAGE_MARGIN_VERTICAL - FONT_SIZE, (float) (FONT_SIZE * 1.5), "REF. " + barReference.getName());
+	}
+	
+	private void printFooter(PDPageContentStream contentStream, PDRectangle mediaBox) throws IOException {
+		float baseY = PAGE_MARGIN_VERTICAL / 2;
+		float fontSize = (float) (FONT_SIZE * 0.6);
+		
+		String[] lines = "Optimiseur de coupe\nCrée par Enzo CACERES pour l'entreprise NEGRO SA".split("\n");
+		for (int index = 0; index < lines.length; index++) {
+			String line = lines[index];
+			
+			/* Approximately */
+			float textWidth = line.length() * (font.getAverageFontWidth() / 1000) * fontSize;
+			float x = (mediaBox.getWidth() - textWidth) / 2;
+			float y = (float) (baseY - (fontSize * index * 1.5));
+			
+			printSimpleText(contentStream, x, y, fontSize, line);
+		}
 	}
 	
 	private boolean haveEnoughSpace(CutGroup cutGroup, int currentY, int maxY) {
@@ -219,10 +237,28 @@ public class PdfDataExporter implements DataExporter {
 		temporaryFiles.add(file);
 	}
 	
+	private void printSimpleText(PDPageContentStream contentStream, float x, float y, float fontSize, String text) throws IOException {
+		contentStream.beginText();
+		contentStream.setFont(font, fontSize);
+		contentStream.setLeading(fontSize);
+		contentStream.newLineAtOffset(x, y);
+		
+		String[] lines = text.split("\n");
+		for (int index = 0; index < lines.length; index++) {
+			contentStream.showText(lines[index]);
+			
+			if (index != lines.length) {
+				contentStream.newLine();
+			}
+		}
+		
+		contentStream.endText();
+	}
+	
 	private void printTextHeader(PDPageContentStream contentStream, float x, float inversedY, String columnText) throws IOException {
 		contentStream.beginText();
 		contentStream.setFont(font, FONT_SIZE);
-		contentStream.setLeading(14.5f);
+		contentStream.setLeading(FONT_SIZE);
 		contentStream.newLineAtOffset(x, inversedY - FONT_SIZE);
 		contentStream.showText(columnText);
 		contentStream.endText();
@@ -236,7 +272,7 @@ public class PdfDataExporter implements DataExporter {
 		{
 			contentStream.beginText();
 			contentStream.setFont(font, FONT_SIZE);
-			contentStream.setLeading(14.5f);
+			contentStream.setLeading(FONT_SIZE);
 			contentStream.newLineAtOffset(x, inversedY - usedY - (FONT_SIZE / 2));
 			
 			for (String line : lines) {
@@ -296,6 +332,11 @@ public class PdfDataExporter implements DataExporter {
 		dummy2.optimize(UnoptimizedCutList.fromCutTableInputs(getRandomCuts(), 4000.0), new FillingCutAlgorithm());
 		
 		new PdfDataExporter().exportToFile(Arrays.asList(dummy, dummy2), null);
+		
+		BarReference dummy3 = new BarReference("Hello 2", new ArrayList<>());
+		dummy3.optimize(UnoptimizedCutList.fromCutTableInputs(getCutsAt(265.3, 22), 6500.0), new FillingCutAlgorithm());
+		
+		new PdfDataExporter().exportToFile(Arrays.asList(dummy3), null);
 	}
 	
 	static List<CutTableInput> getRandomCuts() {
@@ -312,6 +353,22 @@ public class PdfDataExporter implements DataExporter {
 			
 			cutTableInputs.add(cutTableInput);
 		}
+		
+		return cutTableInputs;
+	}
+	
+	static List<CutTableInput> getCutsAt(double length, int quantity) {
+		List<CutTableInput> cutTableInputs = new ArrayList<>();
+		
+		Random random = new Random();
+		
+		CutTableInput cutTableInput = new CutTableInput();
+		
+		cutTableInput.setLength(length);
+		cutTableInput.setQuantity(quantity);
+		cutTableInput.setCutAngles(new int[] { random.nextBoolean() ? 90 : 45, random.nextBoolean() ? 90 : 45 });
+		
+		cutTableInputs.add(cutTableInput);
 		
 		return cutTableInputs;
 	}
