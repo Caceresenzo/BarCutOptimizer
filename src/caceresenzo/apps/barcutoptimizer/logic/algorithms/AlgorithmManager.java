@@ -11,6 +11,7 @@ import java.util.Objects;
 import caceresenzo.apps.barcutoptimizer.logic.algorithms.annotations.AlgorithmSetting;
 import caceresenzo.apps.barcutoptimizer.logic.algorithms.implementations.FillingCutAlgorithm;
 import caceresenzo.libs.internationalization.i18n;
+import caceresenzo.libs.logger.Logger;
 import caceresenzo.libs.reflection.ReflectionUtils;
 
 public class AlgorithmManager {
@@ -37,7 +38,7 @@ public class AlgorithmManager {
 	private void register(CutAlgorithm cutAlgorithm) {
 		Objects.requireNonNull(cutAlgorithm);
 		
-		System.out.println("Added algorithm: " + cutAlgorithm.getClass().getSimpleName());
+		Logger.info("Added algorithm: %s", cutAlgorithm.getClass().getSimpleName());
 		
 		algorithms.add(cutAlgorithm);
 		settingEntries.put(cutAlgorithm, new ArrayList<>());
@@ -51,7 +52,7 @@ public class AlgorithmManager {
 			AlgorithmSetting algorithmSetting = field.getAnnotation(AlgorithmSetting.class);
 			
 			if (algorithmSetting != null) {
-				System.out.println("From algorithm: " + cutAlgorithm.getClass().getSimpleName() + ", found setting: " + algorithmSetting.key());
+				Logger.info("From algorithm: %s, found setting: %s", cutAlgorithm.getClass().getSimpleName(), algorithmSetting.key());
 				
 				ReflectionUtils.silentlyRemoveFinalProtection(field);
 				

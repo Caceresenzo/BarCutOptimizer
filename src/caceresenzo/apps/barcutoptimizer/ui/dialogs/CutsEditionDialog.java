@@ -83,6 +83,7 @@ public class CutsEditionDialog extends JDialog implements Constants {
 		setMinimumSize(getSize());
 		setResizable(true);
 		setLocationRelativeTo(null);
+		setTitle(i18n.string("cut-editor.frame.title"));
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -244,7 +245,7 @@ public class CutsEditionDialog extends JDialog implements Constants {
 				} catch (Exception exception) {
 					exception.printStackTrace();
 					
-					JOptionPane.showConfirmDialog(CutsEditionDialog.this, "L'optimisation a échoué.\nL'optimiseur a renvoyé une erreur: " + exception.getLocalizedMessage() + "\nVoir la console pour plus de détail.", "Erreur", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showConfirmDialog(CutsEditionDialog.this, i18n.string("cut-algorithm.error.failed", exception.getLocalizedMessage()), i18n.string("dialog.error.title"), JOptionPane.ERROR_MESSAGE);
 					
 					callback.onException(barReference, exception);
 				}

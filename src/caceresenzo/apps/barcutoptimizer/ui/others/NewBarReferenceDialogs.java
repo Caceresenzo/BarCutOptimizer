@@ -6,6 +6,7 @@ import javax.swing.JOptionPane;
 
 import caceresenzo.apps.barcutoptimizer.models.BarReference;
 import caceresenzo.apps.barcutoptimizer.ui.BarCutOptimizerWindow;
+import caceresenzo.libs.internationalization.i18n;
 import caceresenzo.libs.string.StringUtils;
 
 public class NewBarReferenceDialogs {
@@ -19,7 +20,7 @@ public class NewBarReferenceDialogs {
 	}
 	
 	public BarReference openBarReferenceCreationDialog() {
-		String name = JOptionPane.showInputDialog(BarCutOptimizerWindow.get().getWindow(), "What's your name?");
+		String name = JOptionPane.showInputDialog(BarCutOptimizerWindow.get().getWindow(), i18n.string("dialog.new-bar-reference.message"));
 		
 		if (!StringUtils.validate(name)) {
 			return null;

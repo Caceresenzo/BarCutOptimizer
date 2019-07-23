@@ -13,6 +13,7 @@ import caceresenzo.apps.barcutoptimizer.logic.importer.DataImporter;
 import caceresenzo.apps.barcutoptimizer.logic.importer.implementations.EasyWinFormatDataImporter;
 import caceresenzo.apps.barcutoptimizer.models.BarReference;
 import caceresenzo.apps.barcutoptimizer.ui.BarCutOptimizerWindow;
+import caceresenzo.libs.internationalization.i18n;
 import caceresenzo.libs.string.StringUtils;
 
 public class ImportDialogs implements Constants {
@@ -26,7 +27,7 @@ public class ImportDialogs implements Constants {
 	}
 	
 	public void startImportationProcess() {
-		FileDialog fileDialog = new FileDialog(BarCutOptimizerWindow.get().getWindow(), "Choose a file", FileDialog.LOAD);
+		FileDialog fileDialog = new FileDialog(BarCutOptimizerWindow.get().getWindow(), i18n.string("import.dialog.title"), FileDialog.LOAD);
 		fileDialog.setLocationRelativeTo(null);
 		fileDialog.setFile("*." + PDF_EXTENSION);
 		fileDialog.setFilenameFilter((dir, name) -> name.endsWith("." + PDF_EXTENSION));
@@ -47,7 +48,7 @@ public class ImportDialogs implements Constants {
 	
 	private void load(File file) {
 		if (!file.exists() || !file.canRead()) {
-			showError("Le fichier n'est pas lisible ou accessible.");
+			showError(i18n.string("import.error.file-not-accessible"));
 			return;
 		}
 		
@@ -56,7 +57,7 @@ public class ImportDialogs implements Constants {
 			List<BarReference> barReferences = importer.loadFromFile(file);
 			
 			if (barReferences == null || barReferences.isEmpty()) {
-				showError("Aucune barre n'a été trouvé.");
+				showError(i18n.string("import.error.no-bar-found"));
 				return;
 			}
 			
@@ -64,12 +65,12 @@ public class ImportDialogs implements Constants {
 			BarCutOptimizerWindow.get().openEditor(barReferences);
 		} catch (Exception exception) {
 			exception.printStackTrace();
-			showError("Erreur lors de l'importation: " + StringUtils.fromException(exception));
+			showError(i18n.string("import.error.failed-to-import", StringUtils.fromException(exception)));
 		}
 	}
 	
 	private void showError(String description) {
-		JOptionPane.showMessageDialog(BarCutOptimizerWindow.get().getWindow(), description, "Erreur", JOptionPane.INFORMATION_MESSAGE, new ImageIcon(ImportDialogs.class.getResource(Assets.ICON_ERROR)));
+		JOptionPane.showMessageDialog(BarCutOptimizerWindow.get().getWindow(), description, i18n.string("dialog.error.title"), JOptionPane.INFORMATION_MESSAGE, new ImageIcon(ImportDialogs.class.getResource(Assets.ICON_ERROR)));
 	}
 	
 	/** @return ImportDialogs's singleton instance. */

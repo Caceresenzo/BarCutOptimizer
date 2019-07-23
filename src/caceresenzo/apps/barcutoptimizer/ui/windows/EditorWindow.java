@@ -43,12 +43,13 @@ import caceresenzo.apps.barcutoptimizer.ui.components.CutGroupPanel;
 import caceresenzo.apps.barcutoptimizer.ui.dialogs.CutsEditionDialog;
 import caceresenzo.apps.barcutoptimizer.ui.others.NewBarReferenceDialogs;
 import caceresenzo.libs.internationalization.i18n;
+import caceresenzo.libs.logger.Logger;
 
 public class EditorWindow implements Constants {
 	
 	private JFrame frame;
 	private DefaultMutableTreeNode rootNode;
-
+	
 	private List<BarReference> barReferences;
 	private BarReference currentBarReference;
 	private JPanel cutGroupListContainerPanel;
@@ -254,7 +255,7 @@ public class EditorWindow implements Constants {
 							displayBarReference(barReference);
 						}
 						
-						System.out.println("Hello: " + hasDoneOptimization);
+						Logger.info("Received callback from the cut editor dialog. (hashasDoneOptimization? %s)", hasDoneOptimization);
 					}
 					
 					@Override
@@ -318,70 +319,27 @@ public class EditorWindow implements Constants {
 		clearDisplaySection();
 		
 		Object userObject = defaultMutableTreeNode.getUserObject();
-		CutGroup cutGroup = null;
 		
 		if (userObject instanceof CutGroup) {
-			cutGroup = (CutGroup) userObject;
-			
 			userObject = ((DefaultMutableTreeNode) defaultMutableTreeNode.getParent()).getUserObject();
 		}
 		
 		if (userObject instanceof BarReference) {
 			displayBarReference((BarReference) userObject);
 		}
-		
-		if (cutGroup != null) {
-			scrollToCutGroup(cutGroup);
-		}
-		
-		System.out.println(defaultMutableTreeNode);
 	}
 	
 	private void displayBarReference(BarReference barReference) {
 		clearDisplaySection();
 		
 		currentBarReference = barReference;
-
-//		barReference.getCutGroups().forEach((cutGroup) -> cutGroupListContainerPanel.add(new CutGroupPanel(cutGroup)));
+		
 		barReference.getCutGroups().forEach((cutGroup) -> {
 			cutGroupListContainerPanel.add(new CutGroupPanel(cutGroup));
-			System.out.println(cutGroup);
 		});
 		
-		System.out.println("Displayed: " + barReference);
-
 		editCutsButton.setEnabled(true);
-		cutGroupListScrollPanel.updateUI();
-		// frame.pack();
-	}
-	
-	private void scrollToCutGroup(CutGroup cutGroup) {
-		Component[] components = cutGroupListContainerPanel.getComponents();
-		CutGroupPanel cutGroupPanel = null;
-		
-		for (int i = 0; i < components.length; i++) {
-			Component component = components[i];
-			
-			if (!(component instanceof CutGroupPanel)) {
-				continue;
-			}
-			
-			if (((CutGroupPanel) component).getCutGroup().equals(cutGroup)) {
-				cutGroupPanel = (CutGroupPanel) component;
-				break;
-			}
-		}
-		
-		if (cutGroupPanel == null) {
-			System.out.println("No cutGroupPanel found for cut group: " + cutGroup);
-			return;
-		}
-		
-		// Rectangle bounds = cutGroupPanel.getBounds();
-		// bounds.setLocation(SwingUtilities.convertPoint(cutGroupPanel, bounds.getPoint(), topLevelParentPaneInScrollPane));
-		// cutGroupListScrollPanel.getViewport().scrollRectToVisible(cutGroupPanel.getBounds());
-		// cutGroupListScrollPanel.getVerticalScrollBar().setValue(cutGroupPanel.getLocation().y - 50);
-		// System.out.println("Scrolling to Y: " + (cutGroupPanel.getLocation().y - 50));
+		cutGroupListScrollPanel.getVerticalScrollBar().setValue(0);
 	}
 	
 	private void clearDisplaySection() {
@@ -412,7 +370,7 @@ public class EditorWindow implements Constants {
 		Object userObject = defaultMutableTreeNode.getUserObject();
 		
 		if (rootNode.equals(defaultMutableTreeNode)) {
-			JMenuItem emptyMenuItem = new JMenuItem("Tout vider", new ImageIcon(EditorWindow.class.getResource(Assets.ICON_SHREDDER_SMALL)));
+			JMenuItem emptyMenuItem = new JMenuItem(i18n.string("editor.tree.popup-menu.item.empty"), new ImageIcon(EditorWindow.class.getResource(Assets.ICON_SHREDDER_SMALL)));
 			emptyMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent event) {
@@ -445,7 +403,7 @@ public class EditorWindow implements Constants {
 			final CutGroup finalCutGroup = cutGroup;
 			final BarReference finalBarReference = barReference;
 			
-			JMenuItem deleteMenuItem = new JMenuItem("Supprimer ?", new ImageIcon(EditorWindow.class.getResource(Assets.ICON_DELETE_SMALL)));
+			JMenuItem deleteMenuItem = new JMenuItem(i18n.string("editor.tree.popup-menu.item.remove"), new ImageIcon(EditorWindow.class.getResource(Assets.ICON_DELETE_SMALL)));
 			deleteMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent event) {
