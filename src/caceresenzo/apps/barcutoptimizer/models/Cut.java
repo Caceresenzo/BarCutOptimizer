@@ -1,6 +1,7 @@
 package caceresenzo.apps.barcutoptimizer.models;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,6 +30,14 @@ public class Cut implements Cloneable {
 	
 	public int getCutAngleB() {
 		return cutAngles[1];
+	}
+	
+	public boolean isAngleDegree(int angle, int degree) {
+		if (angle < 0 || angle > 1) {
+			throw new IllegalArgumentException("The angle parameter must be eather 0 or 1.");
+		}
+		
+		return getCutAngles()[angle] == degree;
 	}
 	
 	public boolean hasSameCutProperties(Cut other) {
@@ -111,7 +120,34 @@ public class Cut implements Cloneable {
 	}
 	
 	public static void sortByLength(List<Cut> cuts) {
-		cuts.sort((cut1, cut2) -> Integer.signum((int) ((cut2.getLength() * 10) - (cut1.getLength() * 10))));
+		cuts.sort(new Comparator<Cut>() {
+			@Override
+			public int compare(Cut cut1, Cut cut2) {
+				int result = Integer.signum((int) ((cut2.getLength() * 10) - (cut1.getLength() * 10)));
+				
+				if (result != 0) {
+					return result;
+				}
+				
+				if (cut1.isAngleDegree(0, 90) && cut2.isAngleDegree(0, 45)) {
+					return -1;
+				}
+				
+				if (cut1.isAngleDegree(0, 45) && cut2.isAngleDegree(0, 90)) {
+					return 1;
+				}
+				
+				if (cut1.isAngleDegree(1, 90) && cut2.isAngleDegree(1, 45)) {
+					return -1;
+				}
+				
+				if (cut1.isAngleDegree(1, 45) && cut2.isAngleDegree(1, 90)) {
+					return 1;
+				}
+				
+				return 0;
+			}
+		});
 	}
 	
 	public static Cut fromCutTableInput(CutTableInput cutTableInput) {

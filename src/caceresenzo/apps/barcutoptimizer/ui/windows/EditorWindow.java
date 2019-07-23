@@ -36,6 +36,8 @@ import javax.swing.tree.TreeSelectionModel;
 
 import caceresenzo.apps.barcutoptimizer.assets.Assets;
 import caceresenzo.apps.barcutoptimizer.config.Constants;
+import caceresenzo.apps.barcutoptimizer.logic.exporter.DataExporter;
+import caceresenzo.apps.barcutoptimizer.logic.exporter.implementations.PdfDataExporter;
 import caceresenzo.apps.barcutoptimizer.models.BarReference;
 import caceresenzo.apps.barcutoptimizer.models.Cut;
 import caceresenzo.apps.barcutoptimizer.models.CutGroup;
@@ -57,6 +59,7 @@ public class EditorWindow implements Constants {
 	private JButton addNewBarReferenceButton;
 	private JButton editCutsButton;
 	private JTree tree;
+	private JButton button;
 	
 	public static void main(String[] args) {
 		BarReference dummy1 = new BarReference("hello", new ArrayList<>());
@@ -96,8 +99,7 @@ public class EditorWindow implements Constants {
 		
 		addNewBarReferenceButton = new JButton(i18n.string("editor.button.add-new-bar-reference"));
 		
-		JButton button = new JButton(" ");
-		button.setEnabled(false);
+		button = new JButton("export");
 		
 		editCutsButton = new JButton(i18n.string("editor.button.edit-cuts"));
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
@@ -242,6 +244,20 @@ public class EditorWindow implements Constants {
 				barReferences.add(barReference);
 				createTreeNodes();
 				reloadTreeNode(null);
+			}
+		});
+		
+		button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				DataExporter exporter = new PdfDataExporter();
+				
+				try {
+					exporter.exportToFile(barReferences, null);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 		
@@ -441,4 +457,7 @@ public class EditorWindow implements Constants {
 		return window;
 	}
 	
+	public JButton getButton() {
+		return button;
+	}
 }

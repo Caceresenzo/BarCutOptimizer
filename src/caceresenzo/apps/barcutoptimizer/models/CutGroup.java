@@ -62,7 +62,7 @@ public class CutGroup {
 		return cuts;
 	}
 	
-	public Object getCutCount() {
+	public int getCutCount() {
 		return cuts.size();
 	}
 	

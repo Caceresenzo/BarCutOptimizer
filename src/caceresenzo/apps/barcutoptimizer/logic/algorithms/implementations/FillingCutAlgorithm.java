@@ -28,6 +28,7 @@ public class FillingCutAlgorithm implements CutAlgorithm {
 		
 		final double barLength = unoptimizedCutList.getBarLength();
 		final List<Cut> cuts = new ArrayList<>(unoptimizedCutList.getCuts());
+		Cut.sortByLength(cuts);
 		
 		final double usableBarLength = barLength - START_OFFSET - END_OFFSET;
 		if (usableBarLength <= 0) {

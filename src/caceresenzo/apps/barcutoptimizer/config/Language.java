@@ -49,7 +49,7 @@ public class Language {
 			o("editor.tree.popup-menu.item.empty", "Tout vider");
 			
 			o("editor.list.item.cut-group.title.format", "%smm - %s coupe(s) - chute de %smm");
-			o("editor.list.item.cut-group.title.format.without-remaining", "%smm - %s coupe(s) - chute inconnu");
+			o("editor.list.item.cut-group.title.format.without-remaining", "%smm - %s coupe(s) - chute inconnue");
 			
 			o("editor.button.add-new-bar-reference", "AJOUTER UNE RÉFÉRENCE");
 			o("editor.button.edit-cuts", "MODIFIER LES DONNÉES");
