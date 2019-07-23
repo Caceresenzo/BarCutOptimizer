@@ -1,9 +1,10 @@
 package caceresenzo.apps.barcutoptimizer.models;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
-public class Cut {
+public class Cut implements Cloneable {
 	
 	private final double length;
 	private final int[] cutAngles;
@@ -56,6 +57,28 @@ public class Cut {
 		return this.length <= inLength;
 	}
 	
+	@Override
+	public String toString() {
+		return "Cut[length = " + length + ", cutAngle = " + Arrays.toString(cutAngles) + "]";
+	}
+	
+	public CutTableInput toTableInput() {
+		CutTableInput cutTableInput = new CutTableInput();
+		
+		cutTableInput.setLength(getLength());
+		cutTableInput.setCutAngles(getCutAngles());
+		
+		return cutTableInput;
+	}
+	
+	@Override
+	protected Cut clone() {
+		Cut cut = new Cut(getLength(), getCutAngles());
+		cut.atLineIndex = getAtLineIndex();
+		
+		return cut;
+	}
+	
 	public static Cut fromExtractedLine(String line) {
 		// System.out.println(line);
 		String[] rawData = Objects.requireNonNull(line.split(" "), "Can't construct a Cut object with a null extracted line.");
@@ -87,8 +110,11 @@ public class Cut {
 		return new Cut(length, new int[] { angleA, angleB });
 	}
 	
-	@Override
-	public String toString() {
-		return "Cut[length = " + length + ", cutAngle = " + Arrays.toString(cutAngles) + "]";
+	public static void sortByLength(List<Cut> cuts) {
+		cuts.sort((cut1, cut2) -> Integer.signum((int) ((cut2.getLength() * 10) - (cut1.getLength() * 10))));
+	}
+	
+	public static Cut fromCutTableInput(CutTableInput cutTableInput) {
+		return new Cut(cutTableInput.getLength(), cutTableInput.getCutAngles());
 	}
 }

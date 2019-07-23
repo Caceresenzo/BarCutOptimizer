@@ -1,17 +1,17 @@
 package caceresenzo.apps.barcutoptimizer.logic.algorithms.implementations;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 import caceresenzo.apps.barcutoptimizer.logic.algorithms.CutAlgorithm;
+import caceresenzo.apps.barcutoptimizer.logic.algorithms.CutAlgorithmException;
 import caceresenzo.apps.barcutoptimizer.logic.algorithms.annotations.AlgorithmSetting;
 import caceresenzo.apps.barcutoptimizer.models.Cut;
 import caceresenzo.apps.barcutoptimizer.models.CutGroup;
 import caceresenzo.apps.barcutoptimizer.models.UnoptimizedCutList;
 
-public class LowLossCutAlgorithm implements CutAlgorithm {
+public class FillingCutAlgorithm implements CutAlgorithm {
 	
 	@AlgorithmSetting(key = "start-offset")
 	public static final double START_OFFSET = 50.0d;
@@ -42,6 +42,10 @@ public class LowLossCutAlgorithm implements CutAlgorithm {
 			while (iterator.hasNext() && remainingBarLength > 0) {
 				Cut cut = iterator.next();
 				
+				if (!cut.isFitting(usableBarLength)) {
+					throw new CutAlgorithmException("Usable bar length is shorter than a cut.");
+				}
+				
 				if (cut.isFitting(remainingBarLength)) {
 					iterator.remove();
 					barCuts.add(cut);
@@ -58,10 +62,9 @@ public class LowLossCutAlgorithm implements CutAlgorithm {
 		return groups;
 	}
 	
-	public static void main(String[] args) {
-		UnoptimizedCutList unoptimizedCutList = new UnoptimizedCutList(6500.0, Arrays.asList(Cut.dummy(500, 90, 90), Cut.dummy(2500, 90, 90), Cut.dummy(2500, 90, 90)));
-		
-		new LowLossCutAlgorithm().optimize(unoptimizedCutList).forEach((group) -> System.out.println(group.getCuts()));
+	@Override
+	public String getTranslationKey() {
+		return "filling";
 	}
 	
 }

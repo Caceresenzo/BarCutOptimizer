@@ -9,4 +9,6 @@ public interface CutAlgorithm {
 	
 	public List<CutGroup> optimize(UnoptimizedCutList unoptimizedCutList);
 	
+	public String getTranslationKey();
+	
 }

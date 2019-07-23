@@ -1,5 +1,6 @@
 package caceresenzo.apps.barcutoptimizer.models;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,6 +25,21 @@ public class UnoptimizedCutList extends CutGroup {
 	@Override
 	public double getRemainingBarLength() {
 		throw new IllegalStateException("Can't get the remaining bar length of an unoptimized cut list.");
+	}
+	
+	public static UnoptimizedCutList fromCutTableInputs(List<CutTableInput> cutInputs, double barLength) {
+		List<Cut> cuts = new ArrayList<>();
+		
+		for (CutTableInput cutTableInput : cutInputs) {
+			Cut cut = Cut.fromCutTableInput(cutTableInput);
+			int quantity = cutTableInput.getQuantity();
+			
+			for (int i = 0; i < quantity; i++) {
+				cuts.add(cut.clone());
+			}
+		}
+		
+		return new UnoptimizedCutList(barLength, cuts);
 	}
 	
 }

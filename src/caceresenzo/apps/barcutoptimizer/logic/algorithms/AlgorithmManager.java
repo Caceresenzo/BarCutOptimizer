@@ -9,7 +9,9 @@ import java.util.Map;
 import java.util.Objects;
 
 import caceresenzo.apps.barcutoptimizer.logic.algorithms.annotations.AlgorithmSetting;
-import caceresenzo.apps.barcutoptimizer.logic.algorithms.implementations.LowLossCutAlgorithm;
+import caceresenzo.apps.barcutoptimizer.logic.algorithms.implementations.FillingCutAlgorithm;
+import caceresenzo.libs.internationalization.i18n;
+import caceresenzo.libs.reflection.ReflectionUtils;
 
 public class AlgorithmManager {
 	
@@ -27,7 +29,7 @@ public class AlgorithmManager {
 	}
 	
 	public void initialize() {
-		register(new LowLossCutAlgorithm());
+		register(new FillingCutAlgorithm());
 		
 		algorithms.forEach((algorithm) -> extractSettingEntries(algorithm));
 	}
@@ -51,9 +53,39 @@ public class AlgorithmManager {
 			if (algorithmSetting != null) {
 				System.out.println("From algorithm: " + cutAlgorithm.getClass().getSimpleName() + ", found setting: " + algorithmSetting.key());
 				
+				ReflectionUtils.silentlyRemoveFinalProtection(field);
+				
 				settingEntries.get(cutAlgorithm).add(new AlgorithmSettingEntry(cutAlgorithm, field, algorithmSetting));
 			}
 		}
+	}
+	
+	public List<AlgorithmSettingEntry> getAlgorithmSettingEntries(CutAlgorithm cutAlgorithm) {
+		return settingEntries.get(cutAlgorithm);
+	}
+	
+	public static String getBaseTranslationKey(CutAlgorithm cutAlgorithm) {
+		return "cut-algorithm." + cutAlgorithm.getTranslationKey();
+	}
+	
+	public static String getTranslatedName(CutAlgorithm cutAlgorithm) {
+		return i18n.string(getBaseTranslationKey(cutAlgorithm) + ".name");
+	}
+	
+	public static String getTranslatedDescription(CutAlgorithm cutAlgorithm) {
+		return i18n.string(getBaseTranslationKey(cutAlgorithm) + ".description");
+	}
+	
+	public static String getBaseTranslationKey(AlgorithmSettingEntry algorithmSettingEntry) {
+		return getBaseTranslationKey(algorithmSettingEntry.getAlgorithmInstance()) + ".setting." + algorithmSettingEntry.getI18nKey();
+	}
+	
+	public static String getTranslatedName(AlgorithmSettingEntry algorithmSettingEntry) {
+		return i18n.string(getBaseTranslationKey(algorithmSettingEntry) + ".name");
+	}
+	
+	public static String getTranslatedDescription(AlgorithmSettingEntry algorithmSettingEntry) {
+		return i18n.string(getBaseTranslationKey(algorithmSettingEntry) + ".description");
 	}
 	
 	/** @return AlgorithmManager's singleton instance. */
@@ -116,7 +148,8 @@ public class AlgorithmManager {
 		
 		public boolean setValue(Object value) {
 			try {
-				field.set(Modifier.isStatic(field.getModifiers()) ? null : algorithmInstance, value);
+				ReflectionUtils.setFinal(field, Modifier.isStatic(field.getModifiers()) ? null : algorithmInstance, value);
+				// field.set(Modifier.isStatic(field.getModifiers()) ? null : algorithmInstance, value);
 				
 				return true;
 			} catch (Exception exception) {
@@ -125,6 +158,20 @@ public class AlgorithmManager {
 			}
 		}
 		
+		public boolean setValueWithAutoParsing(String raw) throws Exception {
+			Object value = null;
+			
+			if (type == Double.class || type == double.class) {
+				value = Double.parseDouble(raw);
+			}
+			
+			return setValue(value);
+		}
+		
+	}
+	
+	public List<CutAlgorithm> getCutAlgorithms() {
+		return algorithms;
 	}
 	
 }
