@@ -57,6 +57,16 @@ public class CutGroup {
 		return remainingBarLength == UNKNOWN_REMAINING;
 	}
 	
+	public double estimateRemainingBarLength() {
+		double etimated = getBarLength();
+		
+		for (Cut cut : cuts) {
+			etimated -= cut.getLength();
+		}
+		
+		return etimated;
+	}
+	
 	/** @return The {@link List} of {@link Cut} that have to be done in this group. */
 	public List<Cut> getCuts() {
 		return cuts;

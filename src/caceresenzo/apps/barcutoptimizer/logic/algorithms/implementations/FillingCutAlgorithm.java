@@ -1,7 +1,6 @@
 package caceresenzo.apps.barcutoptimizer.logic.algorithms.implementations;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -29,7 +28,7 @@ public class FillingCutAlgorithm implements CutAlgorithm {
 		
 		final double barLength = unoptimizedCutList.getBarLength();
 		final List<Cut> cuts = new ArrayList<>(unoptimizedCutList.getCuts());
-		Cut.sortByLength(cuts);
+		Cut.sortByLengthAndAngles(cuts);
 		
 		final double usableBarLength = barLength - START_OFFSET - END_OFFSET;
 		if (usableBarLength <= 0) {

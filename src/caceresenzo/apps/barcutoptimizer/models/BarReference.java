@@ -32,15 +32,15 @@ public class BarReference {
 	/**
 	 * Compute and get a {@link List} of all the {@link Cut} that are available in every {@link #getCutGroups() cut group} of this reference.
 	 * 
-	 * @return A, {@link Cut#sortByLength(List) sorted by length}, {@link List} of all the {@link Cut} for this reference.
-	 * @see Cut#sortByLength(List)
+	 * @return A, {@link Cut#sortByLengthAndAngles(List) sorted by length}, {@link List} of all the {@link Cut} for this reference.
+	 * @see Cut#sortByLengthAndAngles(List)
 	 * @see BarReference#getCutGroups()
 	 */
 	public List<Cut> getAllCuts() {
 		List<Cut> allCuts = new ArrayList<>();
 		
 		getCutGroups().forEach((cutGroup) -> allCuts.addAll(cutGroup.getCuts()));
-		Cut.sortByLength(allCuts);
+		Cut.sortByLengthAndAngles(allCuts);
 		
 		return allCuts;
 	}

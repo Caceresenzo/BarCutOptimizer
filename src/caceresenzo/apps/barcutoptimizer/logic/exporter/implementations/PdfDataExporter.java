@@ -181,15 +181,29 @@ public class PdfDataExporter implements DataExporter {
 							printSimpleHorizontalLine(contentStream, startX, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, (float) (inversedY - usedY));
 							printSimpleHorizontalLine(contentStream, startX, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, (float) (inversedY - (FONT_SIZE * 1.4f) - usedY));
 							printSimpleText(contentStream, startX, (float) (inversedY - FONT_SIZE - usedY), FONT_SIZE, "CHUTE");
-							printSimpleText(contentStream, startX + SPACE_BETWEEN_COLUMN, (float) (inversedY - FONT_SIZE - usedY), FONT_SIZE, StringUtils.prefill(String.valueOf(cutGroup.getRemainingBarLength()), " ", 8));
-							if (ENABLE_WARNING && cutGroup.getRemainingBarLength() < LOW_REMAINING_THRESHOLD) {
-								String warningMessage = i18n.string("exporter.warning.low-remaining");
-								float textWidth = warningMessage.length() * (font.getAverageFontWidth() / 1000) * FONT_SIZE;
-								
-								printSimpleText(contentStream, mediaBox.getWidth() - startX - textWidth, (float) (inversedY - FONT_SIZE - usedY), FONT_SIZE, warningMessage);
+							
+							String barLengthString = String.valueOf(cutGroup.getRemainingBarLength());
+							if (cutGroup.isRemainingBarLengthUnknown()) {
+								barLengthString = i18n.string("exporter.warning.unknown-remaining");
+							}
+							
+							printSimpleText(contentStream, startX + SPACE_BETWEEN_COLUMN, (float) (inversedY - FONT_SIZE - usedY), FONT_SIZE, StringUtils.prefill(barLengthString, " ", 8));
+							
+							String warningMessage = null;
+							if (cutGroup.isRemainingBarLengthUnknown()) {
+								warningMessage = i18n.string("exporter.warning.unknown-remaining.estimated", StringUtils.prefill(String.valueOf(cutGroup.estimateRemainingBarLength()), " ", 7));
+							} else {
+								if (ENABLE_WARNING && cutGroup.getRemainingBarLength() < LOW_REMAINING_THRESHOLD) {
+									warningMessage = i18n.string("exporter.warning.low-remaining");
+								}
+							}
+							
+							if (warningMessage != null) {
+								printSimpleText(contentStream, mediaBox.getWidth() - startX - computeStringWidth(warningMessage), (float) (inversedY - FONT_SIZE - usedY), FONT_SIZE, warningMessage);
 							}
 							
 							usedY += (FONT_SIZE * 1.4);
+							
 							currentY += usedY;
 						}
 						
@@ -524,6 +538,14 @@ public class PdfDataExporter implements DataExporter {
 		theoreticalUsedY += FONT_SIZE * 1.4;
 		
 		return currentY + theoreticalUsedY < maxY;
+	}
+	
+	private float computeStringWidth(String string) {
+		return computeStringWidth(string, FONT_SIZE);
+	}
+	
+	private float computeStringWidth(String string, int fontSize) {
+		return string.length() * (font.getAverageFontWidth() / 1000) * fontSize;
 	}
 	
 	/**
