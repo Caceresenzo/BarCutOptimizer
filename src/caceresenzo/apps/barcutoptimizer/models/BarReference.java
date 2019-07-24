@@ -95,4 +95,24 @@ public class BarReference {
 		}
 	}
 	
+	public static int countAllCutInList(List<BarReference> barReferences) {
+		int count = 0;
+		
+		for (BarReference barReference : barReferences) {
+			count += barReference.getAllCuts().size();
+		}
+		
+		return count;
+	}
+	
+	public static int countAllCutGroupInList(List<BarReference> barReferences) {
+		int count = 0;
+		
+		for (BarReference barReference : barReferences) {
+			count += barReference.getCutGroups().size();
+		}
+		
+		return count;
+	}
+	
 }

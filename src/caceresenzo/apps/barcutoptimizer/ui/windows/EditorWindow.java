@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,6 +24,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SwingUtilities;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -37,6 +39,7 @@ import javax.swing.tree.TreeSelectionModel;
 import caceresenzo.apps.barcutoptimizer.assets.Assets;
 import caceresenzo.apps.barcutoptimizer.config.Constants;
 import caceresenzo.apps.barcutoptimizer.logic.exporter.DataExporter;
+import caceresenzo.apps.barcutoptimizer.logic.exporter.ExporterCallback;
 import caceresenzo.apps.barcutoptimizer.logic.exporter.implementations.PdfDataExporter;
 import caceresenzo.apps.barcutoptimizer.models.BarReference;
 import caceresenzo.apps.barcutoptimizer.models.Cut;
@@ -252,12 +255,42 @@ public class EditorWindow implements Constants {
 			public void actionPerformed(ActionEvent event) {
 				DataExporter exporter = new PdfDataExporter();
 				
-				try {
-					exporter.exportToFile(barReferences, null);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				button.setEnabled(false);
+				
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							exporter.attachCallback(new ExporterCallback() {
+								private String eta;
+								
+								@Override
+								public void onNextEta(String eta) {
+									this.eta = eta;
+								}
+								
+								@Override
+								public void onProgressPublished(int current, int max) {
+									Logger.info("PROGRESS %-40s : %-10s / %10s", eta, current, max);
+								}
+								
+								@Override
+								public void onInitialization(int etaCount) {
+									
+								}
+								
+								@Override
+								public void onFinished(File file) {
+									
+								}
+							}).exportToFile(barReferences, null);
+						} catch (Exception exception) {
+							exception.printStackTrace();
+						}
+						
+						SwingUtilities.invokeLater(() -> button.setEnabled(true));
+					}
+				}).run();
 			}
 		});
 		

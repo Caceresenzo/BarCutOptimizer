@@ -11,4 +11,6 @@ public interface DataExporter {
 	
 	public String formatFilename(File originalFile);
 	
+	public DataExporter attachCallback(ExporterCallback exporterCallback);
+	
 }
