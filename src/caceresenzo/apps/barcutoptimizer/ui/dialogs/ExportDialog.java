@@ -1,6 +1,7 @@
 package caceresenzo.apps.barcutoptimizer.ui.dialogs;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.FileDialog;
 import java.awt.FlowLayout;
 import java.io.File;
@@ -30,6 +31,7 @@ import caceresenzo.apps.barcutoptimizer.models.BarReference;
 import caceresenzo.apps.barcutoptimizer.ui.BarCutOptimizerWindow;
 import caceresenzo.libs.internationalization.i18n;
 import caceresenzo.libs.math.MathUtils;
+import caceresenzo.libs.thread.ThreadUtils;
 
 public class ExportDialog extends JDialog implements Constants {
 	
@@ -188,7 +190,11 @@ public class ExportDialog extends JDialog implements Constants {
 						@Override
 						public void onInitialization(int etaCount) {
 							etaProgressBar.setMaximum(etaCount);
+							
 							progressProgressBar.setMaximum(100);
+							progressProgressBar.setStringPainted(true);
+							
+							setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 						}
 						
 						@Override
@@ -203,6 +209,9 @@ public class ExportDialog extends JDialog implements Constants {
 							// progressProgressBar.setValue(current);
 							
 							progressProgressBar.setValue((int) MathUtils.pourcent(current, max));
+							progressProgressBar.setString(current + " / " + max);
+							
+							// ThreadUtils.sleep(10);
 						}
 						
 						@Override

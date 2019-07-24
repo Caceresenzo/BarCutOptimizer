@@ -27,6 +27,8 @@ public class Language {
 		
 		@Override
 		public void set() {
+			o("multiple-element-letter", "s");
+			
 			o("application.title", "Optimiseur de coupe de barre");
 			
 			o("dialog.error.title", "Erreur");
@@ -78,7 +80,7 @@ public class Language {
 			o("cut-algorithm.filling.setting.cut-offset.name", "Décallage de coupe");
 			o("cut-algorithm.filling.setting.cut-offset.description", "Longueur qui sera considéré comme \"perdu\" entre 2 coupes.");
 			o("cut-algorithm.error.failed", "L'optimisation a échoué.\nL'optimiseur a renvoyé une erreur: %s\nVoir la console pour plus de détail.");
-
+			
 			o("export.frame.title", "Exportation en PDF");
 			o("export.panel.destination", "Destination");
 			o("export.panel.progress", "Avancé");
@@ -93,19 +95,21 @@ public class Language {
 			o("export.eta.done.dialog-title", "Exportation terminé!");
 			o("export.eta.done", "L'exportation est terminé.\nChemin du fichier: %s");
 			o("export.error.generic", "Une erreur est survenu lors de l'exportation.\nMessage: %s\nVoir la console pour plus d'information.");
-
+			
 			o("exporter.word.bar-reference.format", "REF. %s");
 			o("exporter.word.quantity", "QUANTITÉ");
 			o("exporter.word.cut", "COUPE");
-
+			
 			o("exporter.column.bar", "BARRE");
 			o("exporter.column.bar.item.position", "N°%s");
 			o("exporter.column.bar.item.length", "%s mm");
-			o("exporter.column.bar.item.size", "%s élément(s)");
+			o("exporter.column.bar.item.size", "%s élément%s");
 			o("exporter.column.length", "LONGUEUR");
 			o("exporter.column.angle.a", "ANGLE A");
 			o("exporter.column.angle.b", "ANGLE B");
-
+			o("exporter.footer.page", "PAGE LOCALE: %s\nPAGE GLOBAL: %s");
+			o("exporter.warning.low-remaining", "RESTE FAIBLE");
+			
 			o("application.copyright.full", "OPTIMISEUR DE COUPE\nCRÉE PAR ENZO CACERES POUR L'ENTREPRISE NEGRO SA");
 			
 			o("", "");

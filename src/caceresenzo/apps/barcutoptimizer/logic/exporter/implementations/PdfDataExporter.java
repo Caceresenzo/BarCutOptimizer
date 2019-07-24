@@ -26,6 +26,7 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 import caceresenzo.apps.barcutoptimizer.BarCutOptimizer;
 import caceresenzo.apps.barcutoptimizer.assets.Assets;
+import caceresenzo.apps.barcutoptimizer.config.Language;
 import caceresenzo.apps.barcutoptimizer.logic.algorithms.implementations.FillingCutAlgorithm;
 import caceresenzo.apps.barcutoptimizer.logic.exporter.DataExporter;
 import caceresenzo.apps.barcutoptimizer.logic.exporter.ExporterCallback;
@@ -36,6 +37,7 @@ import caceresenzo.apps.barcutoptimizer.models.CutTableInput;
 import caceresenzo.apps.barcutoptimizer.models.UnoptimizedCutList;
 import caceresenzo.apps.barcutoptimizer.ui.components.BarCutPanel;
 import caceresenzo.libs.filesystem.FileUtils;
+import caceresenzo.libs.internationalization.i18n;
 import caceresenzo.libs.logger.Logger;
 import caceresenzo.libs.random.Randomizer;
 import caceresenzo.libs.string.StringUtils;
@@ -51,6 +53,8 @@ public class PdfDataExporter implements DataExporter {
 	public static final int ETA_COUNT = 4;
 	
 	/* Constants */
+	public static final String CUT_GROUP_FILE_FORMAT = "group-%s.png";
+	
 	public static final int BAR_CUT_RENDER_WIDTH = 800;
 	public static final int BAR_CUT_RENDER_HEIGHT = 20;
 	public static final double BAR_CUT_IMAGE_HEIGHT = BAR_CUT_RENDER_HEIGHT * 0.65;
@@ -63,9 +67,12 @@ public class PdfDataExporter implements DataExporter {
 	public static final int SPACE_BETWEEN_COLUMN = (int) (PAGE_MARGIN_HORIZONTAL * (FONT_SIZE / 4f));
 	public static final int SMALL_SPACE_BETWEEN_COLUMN = (int) (PAGE_MARGIN_HORIZONTAL * (FONT_SIZE / 8f));
 	
-	public static final boolean ADD_LINE_BETWEEN_CELL_IN_COUNT_TABLE = false;
+	public static final boolean ADD_LINE_BETWEEN_CELL_IN_COUNT_TABLE = true;
 	public static final boolean CLEANUP_AFTER_EXPORTING = true;
 	public static final boolean OPEN_FILE_AT_END = true;
+	public static final boolean ENABLE_WARNING = true;
+	
+	public static final float LOW_REMAINING_THRESHOLD = 10.0f;
 	
 	/* Callback */
 	private ExporterCallback callback;
@@ -79,7 +86,13 @@ public class PdfDataExporter implements DataExporter {
 	
 	/* Constructor */
 	public PdfDataExporter() {
-		this.temporaryFiles = new ArrayList<>();
+		this.temporaryFiles = new ArrayList<File>() {
+			@Override
+			public boolean add(File file) {
+				file.deleteOnExit();
+				return super.add(file);
+			}
+		};
 	}
 	
 	@SuppressWarnings("unused")
@@ -121,7 +134,7 @@ public class PdfDataExporter implements DataExporter {
 						break;
 					}
 					
-					File cutGroupFile = new File(barReferenceBaseFolder, "group-" + localIndex + ".png");
+					File cutGroupFile = new File(barReferenceBaseFolder, String.format(CUT_GROUP_FILE_FORMAT, localIndex));
 					
 					try {
 						saveCutGroupPicture(cutGroup, cutGroupFile);
@@ -147,18 +160,36 @@ public class PdfDataExporter implements DataExporter {
 							
 							contentStream.drawImage(pdImage, PAGE_MARGIN_HORIZONTAL, inversedY, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL * 2, (int) BAR_CUT_IMAGE_HEIGHT);
 							
-							int usedY1 = printTextColumn(contentStream, PAGE_MARGIN_HORIZONTAL, inversedY, "BARRE", Arrays.asList("N°" + (localIndex + 1), cutGroup.getBarLength() + " mm", cutGroup.getCutCount() + " elements"));
+							int startX = PAGE_MARGIN_HORIZONTAL;
+							
+							int usedY1 = printTextColumn(contentStream, startX, inversedY, i18n.string("exporter.column.bar"), Arrays.asList(
+									i18n.string("exporter.column.bar.item.position", (localIndex + 1)),
+									i18n.string("exporter.column.bar.item.length", cutGroup.getBarLength()),
+									i18n.string("exporter.column.bar.item.size", cutGroup.getCutCount(), cutGroup.getCutCount() > 1 ? i18n.string("multiple-element-letter") : "")));
 							
 							int usedY2 = 0; /* Set 3 times just for the look ;) */
-							usedY2 = printTextColumn(contentStream, PAGE_MARGIN_HORIZONTAL + SPACE_BETWEEN_COLUMN, inversedY, "LONGUEUR", cutListToLines(cuts, (cut) -> StringUtils.prefill(String.valueOf(cut.getLength()), " ", 8)));
-							usedY2 = printTextColumn(contentStream, PAGE_MARGIN_HORIZONTAL + SPACE_BETWEEN_COLUMN * 2, inversedY, "ANGLE A", cutListToLines(cuts, (cut) -> StringUtils.prefill(cut.getCutAngleA() + "°", " ", 7)));
-							usedY2 = printTextColumn(contentStream, PAGE_MARGIN_HORIZONTAL + SPACE_BETWEEN_COLUMN * 3, inversedY, "ANGLE B", cutListToLines(cuts, (cut) -> StringUtils.prefill(cut.getCutAngleB() + "°", " ", 7)));
+							usedY2 = printTextColumn(contentStream, startX + SPACE_BETWEEN_COLUMN, inversedY, i18n.string("exporter.column.length"), cutListToLines(cuts, (cut) -> StringUtils.prefill(String.valueOf(cut.getLength()), " ", 8)));
+							usedY2 = printTextColumn(contentStream, startX + SPACE_BETWEEN_COLUMN * 2, inversedY, i18n.string("exporter.column.angle.a"), cutListToLines(cuts, (cut) -> StringUtils.prefill(cut.getCutAngleA() + "°", " ", 7)));
+							usedY2 = printTextColumn(contentStream, startX + SPACE_BETWEEN_COLUMN * 3, inversedY, i18n.string("exporter.column.angle.b"), cutListToLines(cuts, (cut) -> StringUtils.prefill(cut.getCutAngleB() + "°", " ", 7)));
 							
 							int usedY = Math.max(usedY1, usedY2);
 							
-							printSimpleHorizontalLine(contentStream, PAGE_MARGIN_HORIZONTAL, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, (float) (inversedY - (FONT_SIZE * 1.4)));
-							printSimpleVerticalLine(contentStream, (float) ((PAGE_MARGIN_HORIZONTAL + SPACE_BETWEEN_COLUMN) * 0.91), inversedY, inversedY - usedY);
+							printSimpleHorizontalLine(contentStream, startX, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, (float) (inversedY - (FONT_SIZE * 1.4f)));
+							printSimpleVerticalLine(contentStream, (float) ((startX + SPACE_BETWEEN_COLUMN) * 0.91), inversedY, (float) (inversedY - usedY - (FONT_SIZE * 1.4f)));
 							
+							/* Printing the remaining bar length */
+							printSimpleHorizontalLine(contentStream, startX, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, (float) (inversedY - usedY));
+							printSimpleHorizontalLine(contentStream, startX, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, (float) (inversedY - (FONT_SIZE * 1.4f) - usedY));
+							printSimpleText(contentStream, startX, (float) (inversedY - FONT_SIZE - usedY), FONT_SIZE, "CHUTE");
+							printSimpleText(contentStream, startX + SPACE_BETWEEN_COLUMN, (float) (inversedY - FONT_SIZE - usedY), FONT_SIZE, StringUtils.prefill(String.valueOf(cutGroup.getRemainingBarLength()), " ", 8));
+							if (ENABLE_WARNING && cutGroup.getRemainingBarLength() < LOW_REMAINING_THRESHOLD) {
+								String warningMessage = i18n.string("exporter.warning.low-remaining");
+								float textWidth = warningMessage.length() * (font.getAverageFontWidth() / 1000) * FONT_SIZE;
+								
+								printSimpleText(contentStream, mediaBox.getWidth() - startX - textWidth, (float) (inversedY - FONT_SIZE - usedY), FONT_SIZE, warningMessage);
+							}
+							
+							usedY += (FONT_SIZE * 1.4);
 							currentY += usedY;
 						}
 						
@@ -183,6 +214,7 @@ public class PdfDataExporter implements DataExporter {
 			
 			Map<Cut, Integer> countMap = barReference.computeCutCountMap();
 			ListIterator<Cut> cutIterator = new ArrayList<Cut>(countMap.keySet()).listIterator();
+			int alreadyCountedCut = 0;
 			
 			while (cutIterator.hasNext()) {
 				PDPage page = createPage();
@@ -195,10 +227,7 @@ public class PdfDataExporter implements DataExporter {
 					Cut cut = cutIterator.next();
 					int count = countMap.get(cut);
 					
-					// if (!haveEnoughSpace(cutGroup, currentY, maxY)) {
-					// iterator.previous();
-					// break;
-					// }
+					alreadyCountedCut++;
 					
 					try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, false)) {
 						float cellHeight = (float) (FONT_SIZE * 1.5);
@@ -213,11 +242,14 @@ public class PdfDataExporter implements DataExporter {
 							
 							float textY = mediaBox.getHeight() - PAGE_MARGIN_VERTICAL - (FONT_SIZE * 3f);
 							
-							printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL, textY, FONT_SIZE, "QUANTITé".toUpperCase());
-							printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL + SMALL_SPACE_BETWEEN_COLUMN + FONT_SIZE / 2f, textY, FONT_SIZE, "COUPE");
+							printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL, textY, FONT_SIZE, i18n.string("exporter.word.quantity").toUpperCase());
+							printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL + SMALL_SPACE_BETWEEN_COLUMN + FONT_SIZE / 2f, textY, FONT_SIZE, i18n.string("exporter.word.cut"));
 							
 							printSimpleHorizontalLine(contentStream, PAGE_MARGIN_HORIZONTAL, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, textY - (FONT_SIZE / 2f));
-							printSimpleVerticalLine(contentStream, PAGE_MARGIN_HORIZONTAL + SMALL_SPACE_BETWEEN_COLUMN, (float) (textY + FONT_SIZE), (textY - FONT_SIZE / 2f - cellHeight * countMap.size()));
+							
+							int maxLineY = (int) Math.max((textY - FONT_SIZE / 2f - cellHeight * (countMap.size() - alreadyCountedCut + 1)), PAGE_MARGIN_HORIZONTAL);
+							
+							printSimpleVerticalLine(contentStream, PAGE_MARGIN_HORIZONTAL + SMALL_SPACE_BETWEEN_COLUMN, (float) (textY + FONT_SIZE), maxLineY);
 							
 							currentY += FONT_SIZE * 2.5;
 						}
@@ -254,7 +286,7 @@ public class PdfDataExporter implements DataExporter {
 		
 		if (CLEANUP_AFTER_EXPORTING) {
 			notifyNextEta(ETA_CLEANING_UP);
-			cleanUpTemporaryFiles();
+			cleanUpTemporaryFiles(exportTemporaryFolder);
 		}
 		
 		if (OPEN_FILE_AT_END) {
@@ -488,6 +520,9 @@ public class PdfDataExporter implements DataExporter {
 		/* Text Column Content: max of lines between the information column and the list column */
 		theoreticalUsedY += Math.max(3, cutGroup.getCutCount()) * FONT_SIZE;
 		
+		/* Extra Line after the Column */
+		theoreticalUsedY += FONT_SIZE * 1.4;
+		
 		return currentY + theoreticalUsedY < maxY;
 	}
 	
@@ -594,7 +629,7 @@ public class PdfDataExporter implements DataExporter {
 	 *             If there is an error writing to the stream.
 	 */
 	private void printHeader(PDPageContentStream contentStream, PDRectangle mediaBox, BarReference barReference) throws IOException {
-		printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL, mediaBox.getHeight() - PAGE_MARGIN_VERTICAL - FONT_SIZE, (float) (FONT_SIZE * 1.5), "REF. " + barReference.getName());
+		printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL, mediaBox.getHeight() - PAGE_MARGIN_VERTICAL - FONT_SIZE, (float) (FONT_SIZE * 1.5), i18n.string("exporter.word.bar-reference.format", barReference.getName()));
 		printSimpleHorizontalLine(contentStream, PAGE_MARGIN_HORIZONTAL, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, (float) (mediaBox.getHeight() - PAGE_MARGIN_VERTICAL - (FONT_SIZE * 1.4)));
 	}
 	
@@ -612,7 +647,7 @@ public class PdfDataExporter implements DataExporter {
 		float baseY = PAGE_MARGIN_VERTICAL / 2f;
 		float fontSize = (float) (FONT_SIZE * 0.6);
 		
-		String[] lines = "Optimiseur de coupe\nCrée par Enzo CACERES pour l'entreprise NEGRO SA".split("\n");
+		String[] lines = i18n.string("application.copyright.full").split("\n");
 		for (int index = 0; index < lines.length; index++) {
 			String line = lines[index];
 			
@@ -640,7 +675,7 @@ public class PdfDataExporter implements DataExporter {
 	 *             If there is an error writing to the stream.
 	 */
 	private void printPageFooter(PDPageContentStream contentStream, PDRectangle mediaBox, int globalPageCounter, int localPageCounter) throws IOException {
-		printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL, PAGE_MARGIN_VERTICAL / 2f, (float) (FONT_SIZE * 0.8), "PAGE " + globalPageCounter + " (locale: " + localPageCounter + ")");
+		printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL, PAGE_MARGIN_VERTICAL * 0.8f, (float) (FONT_SIZE * 0.8), i18n.string("exporter.footer.page", localPageCounter + 1, globalPageCounter + 1));
 	}
 	
 	/**
@@ -662,15 +697,21 @@ public class PdfDataExporter implements DataExporter {
 	
 	/**
 	 * Delete all {@link File} previously added in the temporary file {@link List list}.
+	 * 
+	 * @param temporaryFolder
+	 *            Temporary folder used to store bar reference folder.
 	 */
-	private void cleanUpTemporaryFiles() {
-		int total = temporaryFiles.size();
+	private void cleanUpTemporaryFiles(File temporaryFolder) {
+		int total = temporaryFiles.size() + 1;
 		
-		for (int index = 0; index < total; index++) {
+		for (int index = 0; index < total - 1; index++) {
 			temporaryFiles.get(index).delete();
 			
 			publishProgress(index, total);
 		}
+		
+		FileUtils.deleteTree(temporaryFolder);
+		publishProgress(total, total);
 	}
 	
 	/**
@@ -729,18 +770,23 @@ public class PdfDataExporter implements DataExporter {
 	}
 	
 	public static void main(String[] args) throws Exception {
+		Language.get().initialize();
+		File file = new File("null.pdf");
+		
 		BarReference dummy = new BarReference("Hello", new ArrayList<>());
 		dummy.optimize(UnoptimizedCutList.fromCutTableInputs(getRandomCuts(), 6500.0), new FillingCutAlgorithm());
 		
 		BarReference dummy2 = new BarReference("Hello 2", new ArrayList<>());
 		dummy2.optimize(UnoptimizedCutList.fromCutTableInputs(getRandomCuts(), 4000.0), new FillingCutAlgorithm());
 		
-		new PdfDataExporter().exportToFile(Arrays.asList(dummy, dummy2), null);
+		new PdfDataExporter().exportToFile(Arrays.asList(dummy, dummy2), file);
 		
 		// BarReference dummy3 = new BarReference("Hello 2", new ArrayList<>());
 		// dummy3.optimize(UnoptimizedCutList.fromCutTableInputs(getCutsAt(265.3, 22), 6500.0), new FillingCutAlgorithm());
 		
-		// new PdfDataExporter().exportToFile(Arrays.asList(dummy3), null);
+		// new PdfDataExporter().exportToFile(Arrays.asList(dummy3), file);
+		
+		// file.deleteOnExit();
 	}
 	
 	static List<CutTableInput> getRandomCuts() {

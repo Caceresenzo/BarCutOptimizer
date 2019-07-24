@@ -3,6 +3,7 @@ package caceresenzo.apps.barcutoptimizer.logic.algorithms.implementations;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import caceresenzo.apps.barcutoptimizer.logic.algorithms.CutAlgorithm;
 import caceresenzo.apps.barcutoptimizer.logic.algorithms.CutAlgorithmException;
@@ -39,7 +40,7 @@ public class FillingCutAlgorithm implements CutAlgorithm {
 			List<Cut> barCuts = new ArrayList<>();
 			double remainingBarLength = usableBarLength;
 			
-			Iterator<Cut> iterator = cuts.iterator();
+			ListIterator<Cut> iterator = cuts.listIterator();
 			while (iterator.hasNext() && remainingBarLength > 0) {
 				Cut cut = iterator.next();
 				
@@ -52,8 +53,6 @@ public class FillingCutAlgorithm implements CutAlgorithm {
 					barCuts.add(cut);
 					
 					remainingBarLength -= cut.getLength();
-				} else {
-					break;
 				}
 			}
 			
