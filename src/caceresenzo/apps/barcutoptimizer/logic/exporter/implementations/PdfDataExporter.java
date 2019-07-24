@@ -24,6 +24,7 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
+import caceresenzo.apps.barcutoptimizer.BarCutOptimizer;
 import caceresenzo.apps.barcutoptimizer.assets.Assets;
 import caceresenzo.apps.barcutoptimizer.logic.algorithms.implementations.FillingCutAlgorithm;
 import caceresenzo.apps.barcutoptimizer.logic.exporter.DataExporter;
@@ -86,7 +87,8 @@ public class PdfDataExporter implements DataExporter {
 	public void exportToFile(List<BarReference> barReferences, File file) throws Exception {
 		notifyInitialization();
 		
-		File tempFolder = new File("temp", UUID.randomUUID().toString());
+		File exportCacheFolder = new File(BarCutOptimizer.CACHE_FOLDER, "export");
+		File exportTemporaryFolder = new File(exportCacheFolder, UUID.randomUUID().toString());
 		
 		prepareNewDocument();
 		
@@ -96,7 +98,7 @@ public class PdfDataExporter implements DataExporter {
 		
 		int globalPageCounter = 0;
 		for (BarReference barReference : barReferences) {
-			File barReferenceBaseFolder = new File(tempFolder, FileUtils.replaceIllegalChar(barReference.getName()));
+			File barReferenceBaseFolder = new File(exportTemporaryFolder, FileUtils.replaceIllegalChar(barReference.getName()));
 			
 			List<CutGroup> cutGroups = barReference.getCutGroups();
 			ListIterator<CutGroup> iterator = cutGroups.listIterator();
@@ -165,7 +167,7 @@ public class PdfDataExporter implements DataExporter {
 						exception.printStackTrace();
 					}
 					
-					publishProgress(etaCurrentMax, ++etaCurrentProgress);
+					publishProgress(++etaCurrentProgress, etaCurrentMax);
 					
 					if (!iterator.hasNext()) {
 						break;
@@ -248,9 +250,7 @@ public class PdfDataExporter implements DataExporter {
 			temporaryFiles.add(barReferenceBaseFolder);
 		}
 		
-		File exportedFile = new File(tempFolder, "exported.pdf");
-		
-		finishDocument(exportedFile);
+		finishDocument(file);
 		
 		if (CLEANUP_AFTER_EXPORTING) {
 			notifyNextEta(ETA_CLEANING_UP);
@@ -259,10 +259,10 @@ public class PdfDataExporter implements DataExporter {
 		
 		if (OPEN_FILE_AT_END) {
 			notifyNextEta(ETA_OPENING_RESULT);
-			Runtime.getRuntime().exec("cmd /c \"" + exportedFile.getAbsolutePath() + "\"");
+			Runtime.getRuntime().exec("cmd /c \"" + file.getAbsolutePath() + "\"");
 		}
 		
-		notifyFinish(exportedFile);
+		notifyFinish(file);
 	}
 	
 	@Override
@@ -323,19 +323,26 @@ public class PdfDataExporter implements DataExporter {
 	 * @return A {@link BufferedImage buffered image} where a {@link BarCutPanel} painted on it.
 	 */
 	private BufferedImage renderCutGroup(CutGroup cutGroup) {
-		JPanel panel = new BarCutPanel(cutGroup);
-		
-		panel.updateUI();
-		panel.setSize(BAR_CUT_RENDER_WIDTH, BAR_CUT_RENDER_HEIGHT);
-		
-		BufferedImage bufferedImage = new BufferedImage(panel.getWidth(), panel.getHeight(), BufferedImage.TYPE_INT_ARGB);
-		Graphics graphics = bufferedImage.getGraphics();
-		
-		panel.paint(graphics);
-		
-		graphics.dispose();
-		
-		return bufferedImage;
+		while (true) {
+			try {
+				JPanel panel = new BarCutPanel(cutGroup);
+				
+				panel.updateUI();
+				panel.setSize(BAR_CUT_RENDER_WIDTH, BAR_CUT_RENDER_HEIGHT);
+				
+				BufferedImage bufferedImage = new BufferedImage(panel.getWidth(), panel.getHeight(), BufferedImage.TYPE_INT_ARGB);
+				Graphics graphics = bufferedImage.getGraphics();
+				
+				panel.paint(graphics);
+				
+				graphics.dispose();
+				
+				return bufferedImage;
+			} catch (Exception exception) {
+				Logger.warning("javax.swing.RepaintManager.getVolatileOffscreenBuffer() -> java.lang.NullPointerException");
+				// exception.printStackTrace();
+			}
+		}
 	}
 	
 	/**
@@ -657,8 +664,12 @@ public class PdfDataExporter implements DataExporter {
 	 * Delete all {@link File} previously added in the temporary file {@link List list}.
 	 */
 	private void cleanUpTemporaryFiles() {
-		for (File file : temporaryFiles) {
-			file.delete();
+		int total = temporaryFiles.size();
+		
+		for (int index = 0; index < total; index++) {
+			temporaryFiles.get(index).delete();
+			
+			publishProgress(index, total);
 		}
 	}
 	
@@ -735,7 +746,7 @@ public class PdfDataExporter implements DataExporter {
 	static List<CutTableInput> getRandomCuts() {
 		List<CutTableInput> cutTableInputs = new ArrayList<>();
 		
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 100; i++) {
 			CutTableInput cutTableInput = new CutTableInput();
 			
 			Random random = new Random();

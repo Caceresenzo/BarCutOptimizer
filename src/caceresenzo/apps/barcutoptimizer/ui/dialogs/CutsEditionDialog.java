@@ -17,6 +17,7 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -73,10 +74,16 @@ public class CutsEditionDialog extends JDialog implements Constants {
 	/**
 	 * Create the dialog.
 	 */
-	public CutsEditionDialog(BarReference barReference, CutsEditionDialog.Callback callback) {
+	public CutsEditionDialog(JFrame parent, BarReference barReference, CutsEditionDialog.Callback callback) {
+		super(parent);
+		
 		this.barReference = barReference;
 		this.callback = callback;
 		this.barLength = INVALID_LENGTH;
+		
+		if (parent != null) {
+			setModal(true);
+		}
 		
 		setSize(900, 600);
 		setPreferredSize(getSize());
@@ -343,8 +350,8 @@ public class CutsEditionDialog extends JDialog implements Constants {
 		barLength = value;
 	}
 	
-	public static CutsEditionDialog open(BarReference barReference, CutsEditionDialog.Callback callback) {
-		CutsEditionDialog dialog = new CutsEditionDialog(barReference, callback);
+	public static CutsEditionDialog open(JFrame parent, BarReference barReference, CutsEditionDialog.Callback callback) {
+		CutsEditionDialog dialog = new CutsEditionDialog(parent, barReference, callback);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
 		

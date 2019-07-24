@@ -46,34 +46,26 @@ import caceresenzo.apps.barcutoptimizer.models.Cut;
 import caceresenzo.apps.barcutoptimizer.models.CutGroup;
 import caceresenzo.apps.barcutoptimizer.ui.components.CutGroupPanel;
 import caceresenzo.apps.barcutoptimizer.ui.dialogs.CutsEditionDialog;
+import caceresenzo.apps.barcutoptimizer.ui.dialogs.ExportDialog;
 import caceresenzo.apps.barcutoptimizer.ui.others.NewBarReferenceDialogs;
 import caceresenzo.libs.internationalization.i18n;
 import caceresenzo.libs.logger.Logger;
 
 public class EditorWindow implements Constants {
 	
+	/* Components */
 	private JFrame frame;
-	private DefaultMutableTreeNode rootNode;
-	
-	private List<BarReference> barReferences;
 	private BarReference currentBarReference;
 	private JPanel cutGroupListContainerPanel;
 	private JScrollPane cutGroupListScrollPanel;
 	private JButton addNewBarReferenceButton;
 	private JButton editCutsButton;
 	private JTree tree;
-	private JButton button;
+	private JButton exportButton;
 	
-	public static void main(String[] args) {
-		BarReference dummy1 = new BarReference("hello", new ArrayList<>());
-		
-		dummy1.getCutGroups().add(new CutGroup(6500.0d, 0.0d, Arrays.asList(Cut.dummy(500, 45, 45))));
-		dummy1.getCutGroups().add(new CutGroup(6500.0d, 0.0d, Arrays.asList(Cut.dummy(500, 90, 45))));
-		dummy1.getCutGroups().add(new CutGroup(6500.0d, 0.0d, Arrays.asList(Cut.dummy(500, 90, 90))));
-		dummy1.getCutGroups().add(new CutGroup(6500.0d, 0.0d, Arrays.asList(Cut.dummy(500, 45, 90))));
-		
-		open(Arrays.asList(dummy1));
-	}
+	/* Variables */
+	private List<BarReference> barReferences;
+	private DefaultMutableTreeNode rootNode;
 	
 	/**
 	 * Create the application.
@@ -102,7 +94,7 @@ public class EditorWindow implements Constants {
 		
 		addNewBarReferenceButton = new JButton(i18n.string("editor.button.add-new-bar-reference"));
 		
-		button = new JButton("export");
+		exportButton = new JButton(i18n.string("editor.button.export"));
 		
 		editCutsButton = new JButton(i18n.string("editor.button.edit-cuts"));
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
@@ -114,7 +106,7 @@ public class EditorWindow implements Constants {
 										.addGroup(groupLayout.createSequentialGroup()
 												.addComponent(addNewBarReferenceButton, GroupLayout.PREFERRED_SIZE, 247, GroupLayout.PREFERRED_SIZE)
 												.addPreferredGap(ComponentPlacement.RELATED)
-												.addComponent(button, GroupLayout.PREFERRED_SIZE, 252, Short.MAX_VALUE)
+												.addComponent(exportButton, GroupLayout.PREFERRED_SIZE, 252, Short.MAX_VALUE)
 												.addPreferredGap(ComponentPlacement.RELATED)
 												.addComponent(editCutsButton, GroupLayout.PREFERRED_SIZE, 249, Short.MAX_VALUE))
 										.addGroup(groupLayout.createSequentialGroup()
@@ -132,7 +124,7 @@ public class EditorWindow implements Constants {
 								.addPreferredGap(ComponentPlacement.RELATED)
 								.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false)
 										.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE, false)
-												.addComponent(button)
+												.addComponent(exportButton)
 												.addComponent(editCutsButton))
 										.addComponent(addNewBarReferenceButton))
 								.addContainerGap()));
@@ -250,54 +242,12 @@ public class EditorWindow implements Constants {
 			}
 		});
 		
-		button.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				DataExporter exporter = new PdfDataExporter();
-				
-				button.setEnabled(false);
-				
-				new Thread(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							exporter.attachCallback(new ExporterCallback() {
-								private String eta;
-								
-								@Override
-								public void onNextEta(String eta) {
-									this.eta = eta;
-								}
-								
-								@Override
-								public void onProgressPublished(int current, int max) {
-									Logger.info("PROGRESS %-40s : %-10s / %10s", eta, current, max);
-								}
-								
-								@Override
-								public void onInitialization(int etaCount) {
-									
-								}
-								
-								@Override
-								public void onFinished(File file) {
-									
-								}
-							}).exportToFile(barReferences, null);
-						} catch (Exception exception) {
-							exception.printStackTrace();
-						}
-						
-						SwingUtilities.invokeLater(() -> button.setEnabled(true));
-					}
-				}).run();
-			}
-		});
+		exportButton.addActionListener((event) -> ExportDialog.open(getFrame(), new ArrayList<>(barReferences)));
 		
 		editCutsButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				CutsEditionDialog.open(currentBarReference, new CutsEditionDialog.Callback() {
+				CutsEditionDialog.open(getFrame(), currentBarReference, new CutsEditionDialog.Callback() {
 					@Override
 					public void onFinish(BarReference barReference, boolean hasDoneOptimization) {
 						if (hasDoneOptimization) {
@@ -383,9 +333,15 @@ public class EditorWindow implements Constants {
 		
 		currentBarReference = barReference;
 		
-		barReference.getCutGroups().forEach((cutGroup) -> {
-			cutGroupListContainerPanel.add(new CutGroupPanel(cutGroup));
-		});
+		List<CutGroup> cutGroups = barReference.getCutGroups();
+		
+		if (!cutGroups.isEmpty()) {
+			cutGroups.forEach((cutGroup) -> {
+				cutGroupListContainerPanel.add(new CutGroupPanel(cutGroup));
+			});
+		} else {
+			cutGroupListContainerPanel.add(new JLabel("Aucune coupe"));
+		}
 		
 		editCutsButton.setEnabled(true);
 		cutGroupListScrollPanel.getVerticalScrollBar().setValue(0);
@@ -491,6 +447,6 @@ public class EditorWindow implements Constants {
 	}
 	
 	public JButton getButton() {
-		return button;
+		return exportButton;
 	}
 }
