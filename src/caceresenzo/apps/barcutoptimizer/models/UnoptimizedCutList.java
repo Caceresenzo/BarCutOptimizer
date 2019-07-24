@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import caceresenzo.apps.barcutoptimizer.ui.dialogs.CutsEditionDialog;
+
 /**
  * Basically a {@link CutGroup} but with an unmodifiable list for the {@link #getCuts() list of cut}.<br>
  * This class contain {@link Cut} that will need to be optimize.
@@ -27,10 +29,14 @@ public class UnoptimizedCutList extends CutGroup {
 		throw new IllegalStateException("Can't get the remaining bar length of an unoptimized cut list.");
 	}
 	
-	public static UnoptimizedCutList fromCutTableInputs(List<CutTableInput> cutInputs, double barLength) {
+	public static UnoptimizedCutList fromCutTableInputs(List<CutTableInput> cutTableInputs, double barLength) {
 		List<Cut> cuts = new ArrayList<>();
 		
-		for (CutTableInput cutTableInput : cutInputs) {
+		for (CutTableInput cutTableInput : cutTableInputs) {
+			if (cutTableInput.getLength() == CutsEditionDialog.INVALID_LENGTH) {
+				continue;
+			}
+			
 			Cut cut = Cut.fromCutTableInput(cutTableInput);
 			int quantity = cutTableInput.getQuantity();
 			

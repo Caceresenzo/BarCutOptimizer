@@ -244,7 +244,7 @@ public class CutsEditionDialog extends JDialog implements Constants {
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				try {
-					UnoptimizedCutList unoptimizedCutList = UnoptimizedCutList.fromCutTableInputs(((CutTableInputTableModel) table.getModel()).getCutInputs(), barLength);
+					UnoptimizedCutList unoptimizedCutList = UnoptimizedCutList.fromCutTableInputs(((CutTableInputTableModel) table.getModel()).getCutTableInputs(), barLength);
 					
 					barReference.optimize(unoptimizedCutList, (CutAlgorithm) algorithmComboBox.getSelectedItem());
 					
@@ -327,6 +327,8 @@ public class CutsEditionDialog extends JDialog implements Constants {
 		algorithmDescriptionLabel.setText(AlgorithmManager.getTranslatedDescription(cutAlgorithm));
 		
 		algorithmSettingsListPanel.removeAll();
+		algorithmSettingsListPanel.revalidate();
+		algorithmSettingsListPanel.repaint();
 		
 		List<AlgorithmSettingEntry> settingEntries = AlgorithmManager.get().getAlgorithmSettingEntries(cutAlgorithm);
 		for (AlgorithmSettingEntry entry : settingEntries) {
@@ -379,7 +381,7 @@ public class CutsEditionDialog extends JDialog implements Constants {
 	}
 	
 	public class CutTableInputTableModel extends AbstractTableModel {
-		private final List<CutTableInput> cutInputs;
+		private final List<CutTableInput> cutTableInputs;
 		
 		private final String[] columnNames;
 		private final Class[] columnClass;
@@ -394,11 +396,11 @@ public class CutsEditionDialog extends JDialog implements Constants {
 			};
 			this.columnClass = new Class[] { Double.class, Integer.class, Integer.class, Integer.class, Boolean.class };
 			
-			this.cutInputs = new ArrayList<>(cutInputs);
+			this.cutTableInputs = new ArrayList<>(cutInputs);
 		}
 		
 		public void addNewEmptyItem() {
-			cutInputs.add(new CutTableInput());
+			cutTableInputs.add(new CutTableInput());
 		}
 		
 		@Override
@@ -418,12 +420,12 @@ public class CutsEditionDialog extends JDialog implements Constants {
 		
 		@Override
 		public int getRowCount() {
-			return cutInputs.size();
+			return cutTableInputs.size();
 		}
 		
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
-			CutTableInput row = cutInputs.get(rowIndex);
+			CutTableInput row = cutTableInputs.get(rowIndex);
 			
 			switch (columnIndex) {
 				case 0: {
@@ -467,7 +469,7 @@ public class CutsEditionDialog extends JDialog implements Constants {
 		
 		@Override
 		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-			CutTableInput row = cutInputs.get(rowIndex);
+			CutTableInput row = cutTableInputs.get(rowIndex);
 			
 			switch (columnIndex) {
 				case 0: {
@@ -491,7 +493,7 @@ public class CutsEditionDialog extends JDialog implements Constants {
 				}
 				
 				case 4: {
-					cutInputs.remove(row);
+					cutTableInputs.remove(row);
 					table.repaint();
 					break;
 				}
@@ -504,8 +506,8 @@ public class CutsEditionDialog extends JDialog implements Constants {
 			markUserHasChangedData();
 		}
 		
-		public List<CutTableInput> getCutInputs() {
-			return cutInputs;
+		public List<CutTableInput> getCutTableInputs() {
+			return cutTableInputs;
 		}
 	}
 	
