@@ -1,0 +1,6 @@
+1. Décompresser le contenu.
+2. Déplacer le contenu dans un endroit qui ne vous gênera pas. (exemple C:\Program Files\Optimiseur de Coupe)
+3. Exécutez "register context.cmd" en MODE ADMINISTRATEUR.
+4. Vous pouvais maintenant ouvrir l'application avec l'icone qui se trouve sur le bureau.
+
+(5.) Si vous déplacer l'application de place, re-faites l'étape 3
