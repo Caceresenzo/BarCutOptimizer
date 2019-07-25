@@ -112,6 +112,7 @@ public class Language {
 			o("exporter.column.angle.a", "ANGLE A");
 			o("exporter.column.angle.b", "ANGLE B");
 			o("exporter.footer.page", "PAGE LOCALE: %s\nPAGE GLOBAL: %s");
+			o("exporter.message.consumption", "%s coupe%s dans %s barre%s");
 			o("exporter.warning.unknown-remaining", "INCONNU");
 			o("exporter.warning.unknown-remaining.estimated", "ESTIMATION: %-8s");
 			o("exporter.warning.low-remaining", "RESTE FAIBLE");

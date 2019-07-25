@@ -266,6 +266,14 @@ public class PdfDataExporter implements DataExporter {
 							printSimpleVerticalLine(contentStream, PAGE_MARGIN_HORIZONTAL + SMALL_SPACE_BETWEEN_COLUMN, (float) (textY + FONT_SIZE), maxLineY);
 							
 							currentY += FONT_SIZE * 2.5;
+							
+							/* Printing bar consumption */
+							int totalCutCount = barReference.getAllCuts().size();
+							int totalCutGroupCount = barReference.getCutGroups().size();
+							String multipleElementLetter = i18n.string("multiple-element-letter");
+							
+							String consumptionText = i18n.string("exporter.message.consumption", totalCutCount, totalCutCount > 1 ? multipleElementLetter : "", totalCutGroupCount, totalCutGroupCount > 1 ? multipleElementLetter : "");
+							printSimpleText(contentStream, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL - computeStringWidth(consumptionText), textY, FONT_SIZE, consumptionText.toUpperCase());
 						}
 						
 						float inversedY = mediaBox.getHeight() - currentY;
