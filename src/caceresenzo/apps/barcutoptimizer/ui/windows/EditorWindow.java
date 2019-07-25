@@ -44,6 +44,7 @@ import caceresenzo.apps.barcutoptimizer.logic.exporter.implementations.PdfDataEx
 import caceresenzo.apps.barcutoptimizer.models.BarReference;
 import caceresenzo.apps.barcutoptimizer.models.Cut;
 import caceresenzo.apps.barcutoptimizer.models.CutGroup;
+import caceresenzo.apps.barcutoptimizer.ui.components.BarReferenceInfoPanel;
 import caceresenzo.apps.barcutoptimizer.ui.components.CutGroupPanel;
 import caceresenzo.apps.barcutoptimizer.ui.dialogs.CutsEditionDialog;
 import caceresenzo.apps.barcutoptimizer.ui.dialogs.ExportDialog;
@@ -338,6 +339,8 @@ public class EditorWindow implements Constants {
 		List<CutGroup> cutGroups = barReference.getCutGroups();
 		
 		if (!cutGroups.isEmpty()) {
+			cutGroupListContainerPanel.add(new BarReferenceInfoPanel(barReference));
+			
 			cutGroups.forEach((cutGroup) -> {
 				cutGroupListContainerPanel.add(new CutGroupPanel(cutGroup));
 			});

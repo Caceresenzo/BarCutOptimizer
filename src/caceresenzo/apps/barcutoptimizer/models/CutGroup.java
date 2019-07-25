@@ -37,8 +37,8 @@ public class CutGroup {
 	public CutGroup(double barLength, double remainingBarLength, List<Cut> cuts) {
 		validate(barLength, remainingBarLength, cuts);
 		
-		this.barLength = barLength;
-		this.remainingBarLength = remainingBarLength;
+		this.barLength = purifyDouble(barLength, 1);
+		this.remainingBarLength = purifyDouble(remainingBarLength, 1);
 		this.cuts = cuts;
 	}
 	
@@ -74,6 +74,14 @@ public class CutGroup {
 	
 	public int getCutCount() {
 		return cuts.size();
+	}
+	
+	public static double purifyDouble(double value, int precision) {
+		int precisionValue = (int) Math.pow(10, precision);
+		
+		int rounded = (int) (value * precisionValue);
+		
+		return rounded * 1.0d / precisionValue;
 	}
 	
 	/**

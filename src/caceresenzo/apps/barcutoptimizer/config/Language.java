@@ -52,10 +52,11 @@ public class Language {
 			o("editor.tree.item.cut.format", "%smm %s°/%s°");
 			o("editor.tree.popup-menu.item.remove", "Supprimer");
 			o("editor.tree.popup-menu.item.empty", "Tout vider");
-			
+			o("editor.list.item.bar-reference-information.title", "Informations");
+			o("editor.list.item.bar-reference-information.item.consumed-bar-count", "Total barre");
+			o("editor.list.item.bar-reference-information.item.total-cuts-count", "Total coupe");
 			o("editor.list.item.cut-group.title.format", "%smm - %s coupe(s) - chute de %smm");
 			o("editor.list.item.cut-group.title.format.without-remaining", "%smm - %s coupe(s) - chute inconnue");
-			
 			o("editor.button.add-new-bar-reference", "AJOUTER UNE RÉFÉRENCE");
 			o("editor.button.export", "EXPORTER EN PDF...");
 			o("editor.button.edit-cuts", "MODIFIER LES DONNÉES");
