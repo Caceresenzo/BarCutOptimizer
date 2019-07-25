@@ -164,6 +164,10 @@ public class AlgorithmManager {
 			
 			if (type == Double.class || type == double.class) {
 				value = Double.parseDouble(raw);
+			} else if (type == Integer.class || type == int.class) {
+				value = Integer.parseInt(raw);
+			} else {
+				throw new IllegalStateException("Not handled auto-parsing class: " + type.getSimpleName());
 			}
 			
 			return setValue(value);

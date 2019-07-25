@@ -148,6 +148,8 @@ public class EditorWindow implements Constants {
 		
 		if (!barReferences.isEmpty()) {
 			displayBarReference(barReferences.get(0));
+		} else {
+			editCutsButton.setEnabled(false);
 		}
 		
 		frame.pack();

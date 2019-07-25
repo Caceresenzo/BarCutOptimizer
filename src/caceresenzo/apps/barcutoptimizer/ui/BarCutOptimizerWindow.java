@@ -1,11 +1,13 @@
 package caceresenzo.apps.barcutoptimizer.ui;
 
+import java.io.File;
 import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 
 import caceresenzo.apps.barcutoptimizer.models.BarReference;
+import caceresenzo.apps.barcutoptimizer.ui.others.ImportDialogs;
 import caceresenzo.apps.barcutoptimizer.ui.windows.EditorWindow;
 import caceresenzo.apps.barcutoptimizer.ui.windows.StartWindow;
 
@@ -32,6 +34,10 @@ public class BarCutOptimizerWindow {
 	
 	public void openStart() {
 		window = StartWindow.open().getFrame();
+	}
+	
+	public void openFile(File fileToOpen) {
+		ImportDialogs.get().forceImportProcess(fileToOpen);
 	}
 	
 	public void openEditor(List<BarReference> barReferences) {

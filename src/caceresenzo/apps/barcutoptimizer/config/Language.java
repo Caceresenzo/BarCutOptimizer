@@ -32,6 +32,7 @@ public class Language {
 			o("application.title", "Optimiseur de coupe de barre");
 			
 			o("dialog.error.title", "Erreur");
+			o("error.parse-cli", "Une erreur est survenu lors du traitement de l'interface de commande.\nMessage: %s");
 			
 			o("start-window.button.new.html", "NOUVELLE\nOPTIMISATION\n<small>Aucune sauv. possible</small>");
 			o("start-window.button.import.html", "IMPORTER\nUN PDF\n<small>EasyWin</small>");
@@ -42,6 +43,8 @@ public class Language {
 			o("import.error.failed-to-import", "Erreur lors de l'importation: \n%s");
 			
 			o("dialog.new-bar-reference.message", "Référence de la barre");
+			o("dialog.loading-import.title", "Ouverture d'un fichier");
+			o("dialog.loading-import.message", "Traitement du fichier...");
 			
 			o("editor.tree.root", "Racine");
 			o("editor.tree.item.bar-reference.format", "%s");
@@ -71,6 +74,7 @@ public class Language {
 			o("cut-editor.button.ok", "VALIDER");
 			o("cut-editor.button.cancel", "ANNULER");
 			
+			o("cut-algorithm.error.failed", "L'optimisation a échoué.\nL'optimiseur a renvoyé une erreur: %s\nVoir la console pour plus de détail.");
 			o("cut-algorithm.filling.name", "Remplissage");
 			o("cut-algorithm.filling.description", "Remplie les barres en allant de la plus long. vers la moins long.");
 			o("cut-algorithm.filling.setting.start-offset.name", "Décallage de début");
@@ -79,7 +83,6 @@ public class Language {
 			o("cut-algorithm.filling.setting.end-offset.description", "Longueur qui ne sera pas utilisé a la fin d'une barre.");
 			o("cut-algorithm.filling.setting.cut-offset.name", "Décallage de coupe");
 			o("cut-algorithm.filling.setting.cut-offset.description", "Longueur qui sera considéré comme \"perdu\" entre 2 coupes.");
-			o("cut-algorithm.error.failed", "L'optimisation a échoué.\nL'optimiseur a renvoyé une erreur: %s\nVoir la console pour plus de détail.");
 			
 			o("export.frame.title", "Exportation en PDF");
 			o("export.panel.destination", "Destination");
