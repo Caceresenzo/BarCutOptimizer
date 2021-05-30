@@ -96,7 +96,7 @@ public class Cut implements Cloneable {
 		for (int index = 0; index < rawData.length; index++) {
 			String part = rawData[index];
 			
-			if (part.toCharArray()[0] == 'Â°') {
+			if (part.toCharArray()[0] == '°') {
 				firstDegreeCharOffset = index;
 				break;
 			}

@@ -5,7 +5,7 @@ import caceresenzo.libs.internationalization.i18n;
 
 public class Language {
 	
-	public static final String LANGUAGE_FRENCH = "FranÃ§ais";
+	public static final String LANGUAGE_FRENCH = "Français";
 	
 	private static Language LANGUAGE;
 	private HardInternationalization selected = null;
@@ -39,17 +39,17 @@ public class Language {
 			
 			o("import.dialog.title", "Importer un fichier...");
 			o("import.error.file-not-accessible", "Le fichier n'est pas lisible ou accessible.");
-			o("import.error.no-bar-found", "Aucune barre n'a Ã©tÃ© trouvÃ©.");
+			o("import.error.no-bar-found", "Aucune barre n'a été trouvé.");
 			o("import.error.failed-to-import", "Erreur lors de l'importation: \n%s");
 			
-			o("dialog.new-bar-reference.message", "RÃ©fÃ©rence de la barre");
+			o("dialog.new-bar-reference.message", "Référence de la barre");
 			o("dialog.loading-import.title", "Ouverture d'un fichier");
 			o("dialog.loading-import.message", "Traitement du fichier...");
 			
 			o("editor.tree.root", "Racine");
 			o("editor.tree.item.bar-reference.format", "%s");
 			o("editor.tree.item.cut-group.format", "B. %s (%s coupe(s))");
-			o("editor.tree.item.cut.format", "%smm %sÂ°/%sÂ°");
+			o("editor.tree.item.cut.format", "%smm %s°/%s°");
 			o("editor.tree.popup-menu.item.remove", "Supprimer");
 			o("editor.tree.popup-menu.item.empty", "Tout vider");
 			o("editor.list.item.bar-reference-information.title", "Informations");
@@ -57,16 +57,16 @@ public class Language {
 			o("editor.list.item.bar-reference-information.item.total-cuts-count", "Total coupe");
 			o("editor.list.item.cut-group.title.format", "%smm - %s coupe(s) - chute de %smm");
 			o("editor.list.item.cut-group.title.format.without-remaining", "%smm - %s coupe(s) - chute inconnue");
-			o("editor.button.add-new-bar-reference", "AJOUTER UNE RÃ‰FÃ‰RENCE");
+			o("editor.button.add-new-bar-reference", "AJOUTER UNE RÉFÉRENCE");
 			o("editor.button.export", "EXPORTER EN PDF...");
-			o("editor.button.edit-cuts", "MODIFIER LES DONNÃ‰ES");
+			o("editor.button.edit-cuts", "MODIFIER LES DONNÉES");
 			
-			o("cut-editor.frame.title", "Ã‰dition de donnÃ©es");
-			o("cut-editor.panel.data", "DonnÃ©es");
+			o("cut-editor.frame.title", "Édition de données");
+			o("cut-editor.panel.data", "Données");
 			o("cut-editor.panel.data.table.header.column.length", "LONGUEUR");
 			o("cut-editor.panel.data.table.header.column.angle-a", "ANGLE A");
 			o("cut-editor.panel.data.table.header.column.angle-b", "ANGLE B");
-			o("cut-editor.panel.data.table.header.column.quantity", "QUANTITÃ‰");
+			o("cut-editor.panel.data.table.header.column.quantity", "QUANTITÉ");
 			o("cut-editor.panel.data.table.header.column.remove", "SUPPRIMER");
 			o("cut-editor.panel.algorithm", "Algorithme");
 			o("cut-editor.panel.algorithm-settings", "Parametres de l'Algorithme");
@@ -75,39 +75,40 @@ public class Language {
 			o("cut-editor.button.ok", "VALIDER");
 			o("cut-editor.button.cancel", "ANNULER");
 			
-			o("cut-algorithm.error.failed", "L'optimisation a Ã©chouÃ©.\nL'optimiseur a renvoyÃ© une erreur: %s\nVoir la console pour plus de dÃ©tail.");
+			o("cut-algorithm.error.failed", "L'optimisation a échoué.\nL'optimiseur a renvoyé une erreur: %s\nVoir la console pour plus de détail.");
 			o("cut-algorithm.filling.name", "Remplissage");
 			o("cut-algorithm.filling.description", "Remplie les barres en allant de la plus long. vers la moins long.");
-			o("cut-algorithm.filling.setting.start-offset.name", "DÃ©callage de dÃ©but");
-			o("cut-algorithm.filling.setting.start-offset.description", "Longueur qui ne sera pas utilisÃ© au dÃ©but d'une barre.");
-			o("cut-algorithm.filling.setting.end-offset.name", "DÃ©callage de fin");
-			o("cut-algorithm.filling.setting.end-offset.description", "Longueur qui ne sera pas utilisÃ© a la fin d'une barre.");
-			o("cut-algorithm.filling.setting.cut-offset.name", "DÃ©callage de coupe");
-			o("cut-algorithm.filling.setting.cut-offset.description", "Longueur qui sera considÃ©rÃ© comme \"perdu\" entre 2 coupes.");
+			o("cut-algorithm.filling.setting.start-offset.name", "Décallage de début");
+			o("cut-algorithm.filling.setting.start-offset.description", "Longueur qui ne sera pas utilisé au début d'une barre.");
+			o("cut-algorithm.filling.setting.end-offset.name", "Décallage de fin");
+			o("cut-algorithm.filling.setting.end-offset.description", "Longueur qui ne sera pas utilisé a la fin d'une barre.");
+			o("cut-algorithm.filling.setting.cut-offset.name", "Décallage de coupe");
+			o("cut-algorithm.filling.setting.cut-offset.description", "Longueur qui sera considéré comme \"perdu\" entre 2 coupes.");
 			
 			o("export.frame.title", "Exportation en PDF");
 			o("export.panel.destination", "Destination");
-			o("export.panel.progress", "AvancÃ©");
+			o("export.panel.progress", "Avancé");
 			o("export.button.select-file", "Fichier...");
 			o("export.button.export", "EXPORTER");
 			o("export.button.close", "FERMER");
 			o("export.pdf.eta.initializing", "Chargement...");
-			o("export.pdf.eta.generating-pdf", "CrÃ©ation du PDF...");
+			o("export.pdf.eta.generating-pdf", "Création du PDF...");
 			o("export.pdf.eta.cleaning-up", "Suppression des fichiers temporaires...");
-			o("export.pdf.eta.opening-result", "Ouverture du rÃ©sultat...");
+			o("export.pdf.eta.opening-result", "Ouverture du résultat...");
 			o("export.eta.not-even-started", "ATTENTE");
-			o("export.eta.done.dialog-title", "Exportation terminÃ©!");
-			o("export.eta.done", "L'exportation est terminÃ©.\nChemin du fichier: %s");
+			o("export.eta.done.dialog-title", "Exportation terminé!");
+			o("export.eta.done", "L'exportation est terminé.\nChemin du fichier: %s");
 			o("export.error.generic", "Une erreur est survenu lors de l'exportation.\nMessage: %s\nVoir la console pour plus d'information.");
 			
 			o("exporter.word.bar-reference.format", "REF. %s");
-			o("exporter.word.quantity", "QUANTITÃ‰");
+			o("exporter.word.quantity", "QUANTITÉ");
+			o("exporter.word.leftover", "CHUTE");
 			o("exporter.word.cut", "COUPE");
 			
 			o("exporter.column.bar", "BARRE");
-			o("exporter.column.bar.item.position", "NÂ°%s");
+			o("exporter.column.bar.item.position", "N°%s");
 			o("exporter.column.bar.item.length", "%s mm");
-			o("exporter.column.bar.item.size", "%s Ã©lÃ©ment%s");
+			o("exporter.column.bar.item.size", "%s élément%s");
 			o("exporter.column.length", "LONGUEUR");
 			o("exporter.column.angle.a", "ANGLE A");
 			o("exporter.column.angle.b", "ANGLE B");
@@ -117,7 +118,7 @@ public class Language {
 			o("exporter.warning.unknown-remaining.estimated", "ESTIMATION: %-8s");
 			o("exporter.warning.low-remaining", "RESTE FAIBLE");
 			
-			o("application.copyright.full", "OPTIMISEUR DE COUPE\nCRÃ‰E PAR ENZO CACERES POUR L'ENTREPRISE NEGRO SA");
+			o("application.copyright.full", "OPTIMISEUR DE COUPE\nCRÉE PAR ENZO CACERES POUR L'ENTREPRISE NEGRO SA");
 			
 			o("", "");
 		}
