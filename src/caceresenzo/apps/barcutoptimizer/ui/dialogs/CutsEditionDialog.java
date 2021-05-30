@@ -6,11 +6,15 @@ import java.awt.Component;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
 import javax.swing.BoxLayout;
+import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -218,6 +222,31 @@ public class CutsEditionDialog extends JDialog implements Constants {
 		initializeComboBoxes();
 		initializeTextFields();
 		
+		for (Class<?> clazz : Arrays.asList(Object.class, Number.class)) {
+			DefaultCellEditor cellEditor = (DefaultCellEditor) table.getDefaultEditor(clazz);
+			
+			JTextField textField = (JTextField) cellEditor.getComponent();
+			
+			textField.addFocusListener(new FocusAdapter() {
+				@Override
+				public void focusGained(FocusEvent event) {
+					textField.selectAll();
+				}
+			});
+		}
+		
+		table.addPropertyChangeListener("tableCellEditor", (event) -> {
+			DefaultCellEditor cellEditor = (DefaultCellEditor) table.getCellEditor();
+			
+			if (cellEditor != null) {
+				Component component = cellEditor.getComponent();
+				
+				if (component instanceof JTextField) {
+					((JTextField) component).selectAll();
+				}
+			}
+		});
+		
 		pack();
 	}
 	
@@ -264,7 +293,7 @@ public class CutsEditionDialog extends JDialog implements Constants {
 	
 	@SuppressWarnings("unchecked")
 	private void initializeComboBoxes() {
-		algorithmComboBox.setModel(new DefaultComboBoxModel<CutAlgorithm>(new Vector<>(AlgorithmManager.get().getCutAlgorithms())));
+		algorithmComboBox.setModel(new DefaultComboBoxModel<>(new Vector<>(AlgorithmManager.get().getCutAlgorithms())));
 		
 		algorithmComboBox.setRenderer(new BasicComboBoxRenderer() {
 			@Override
