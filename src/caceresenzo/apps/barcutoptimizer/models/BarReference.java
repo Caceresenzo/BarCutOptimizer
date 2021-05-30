@@ -66,6 +66,16 @@ public class BarReference {
 		return map;
 	}
 	
+	public Map<Double, Integer> computeRemainingCountMap() {
+		Map<Double, Integer> map = new LinkedHashMap<>();
+		
+		for (CutGroup cutGroup : getCutGroups()) {
+			map.compute(cutGroup.getRemainingBarLength(), (key, value) -> value == null ? 1 : value + 1);
+		}
+		
+		return map;
+	}
+	
 	public UnoptimizedCutList toUnoptimizedCutList(double barLength) {
 		List<Cut> cuts = new ArrayList<>();
 		Map<Cut, Integer> countMap = computeCutCountMap();

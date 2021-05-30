@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -228,7 +229,7 @@ public class PdfDataExporter implements DataExporter {
 			
 			Map<Cut, Integer> countMap = barReference.computeCutCountMap();
 			ListIterator<Cut> cutIterator = new ArrayList<Cut>(countMap.keySet()).listIterator();
-			int alreadyCountedCut = 0;
+			int alreadyCounted = 0;
 			
 			while (cutIterator.hasNext()) {
 				PDPage page = createPage();
@@ -241,7 +242,7 @@ public class PdfDataExporter implements DataExporter {
 					Cut cut = cutIterator.next();
 					int count = countMap.get(cut);
 					
-					alreadyCountedCut++;
+					alreadyCounted++;
 					
 					try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, false)) {
 						float cellHeight = (float) (FONT_SIZE * 1.5);
@@ -261,7 +262,7 @@ public class PdfDataExporter implements DataExporter {
 							
 							printSimpleHorizontalLine(contentStream, PAGE_MARGIN_HORIZONTAL, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, textY - (FONT_SIZE / 2f));
 							
-							int maxLineY = (int) Math.max((textY - FONT_SIZE / 2f - cellHeight * (countMap.size() - alreadyCountedCut + 1)), PAGE_MARGIN_HORIZONTAL);
+							int maxLineY = (int) Math.max((textY - FONT_SIZE / 2f - cellHeight * (countMap.size() - alreadyCounted + 1)), PAGE_MARGIN_HORIZONTAL);
 							
 							printSimpleVerticalLine(contentStream, PAGE_MARGIN_HORIZONTAL + SMALL_SPACE_BETWEEN_COLUMN, (float) (textY + FONT_SIZE), maxLineY);
 							
@@ -289,6 +290,74 @@ public class PdfDataExporter implements DataExporter {
 					}
 					
 					if (!cutIterator.hasNext()) {
+						break;
+					}
+					
+					evenLocalIndex++;
+				}
+				
+				globalPageCounter++;
+				localPageCounter++;
+			}
+			
+			Map<Double, Integer> remainingCountMap = barReference.computeRemainingCountMap();
+			List<Double> remainingLengths = new ArrayList<>(remainingCountMap.keySet());
+			Collections.sort(remainingLengths);
+			Collections.reverse(remainingLengths);
+			ListIterator<Double> remainingIterator = remainingLengths.listIterator();
+			alreadyCounted = 0;
+			
+			while (remainingIterator.hasNext()) {
+				PDPage page = createPage();
+				PDRectangle mediaBox = page.getMediaBox();
+				final int maxY = (int) (mediaBox.getHeight() - PAGE_MARGIN_VERTICAL);
+				int currentY = PAGE_MARGIN_VERTICAL;
+				
+				int evenLocalIndex = 0;
+				while (currentY < maxY) {
+					double remainingLength = remainingIterator.next();
+					int count = remainingCountMap.get(remainingLength);
+					
+					alreadyCounted++;
+					
+					try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, false)) {
+						float cellHeight = (float) (FONT_SIZE * 1.5);
+						
+						if (evenLocalIndex == 0) {
+							printHeader(contentStream, mediaBox, barReference);
+							printFooter(contentStream, mediaBox);
+							
+							printPageFooter(contentStream, mediaBox, globalPageCounter, localPageCounter);
+							
+							currentY += FONT_SIZE * 2;
+							
+							float textY = mediaBox.getHeight() - PAGE_MARGIN_VERTICAL - (FONT_SIZE * 3f);
+							
+							printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL, textY, FONT_SIZE, i18n.string("exporter.word.quantity").toUpperCase());
+							printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL + SMALL_SPACE_BETWEEN_COLUMN + FONT_SIZE / 2f, textY, FONT_SIZE, i18n.string("exporter.word.leftover"));
+							
+							printSimpleHorizontalLine(contentStream, PAGE_MARGIN_HORIZONTAL, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, textY - (FONT_SIZE / 2f));
+							
+							int maxLineY = (int) Math.max((textY - FONT_SIZE / 2f - cellHeight * (remainingCountMap.size() - alreadyCounted + 1)), PAGE_MARGIN_HORIZONTAL);
+							
+							printSimpleVerticalLine(contentStream, PAGE_MARGIN_HORIZONTAL + SMALL_SPACE_BETWEEN_COLUMN, (float) (textY + FONT_SIZE), maxLineY);
+							
+							currentY += FONT_SIZE * 2.5;
+						}
+						
+						float inversedY = mediaBox.getHeight() - currentY;
+						
+						printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL, inversedY, FONT_SIZE, StringUtils.prefill(String.format("%sx", count), " ", 8));
+						printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL + SMALL_SPACE_BETWEEN_COLUMN + FONT_SIZE / 2f, inversedY, FONT_SIZE, String.format("%-7s", StringUtils.prefill(String.valueOf(remainingLength), " ", 7)));
+						
+						if (ADD_LINE_BETWEEN_CELL_IN_COUNT_TABLE && remainingIterator.hasNext()) {
+							printSimpleHorizontalLine(contentStream, PAGE_MARGIN_HORIZONTAL, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, (float) (inversedY - FONT_SIZE * 0.4f), 0.1f);
+						}
+						
+						currentY += cellHeight;
+					}
+					
+					if (!remainingIterator.hasNext()) {
 						break;
 					}
 					
@@ -822,7 +891,7 @@ public class PdfDataExporter implements DataExporter {
 	static List<CutTableInput> getRandomCuts() {
 		List<CutTableInput> cutTableInputs = new ArrayList<>();
 		
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 10; i++) {
 			CutTableInput cutTableInput = new CutTableInput();
 			
 			Random random = new Random();
