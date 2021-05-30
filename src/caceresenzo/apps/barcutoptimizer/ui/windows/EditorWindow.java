@@ -257,7 +257,7 @@ public class EditorWindow implements Constants {
 							displayBarReference(barReference);
 						}
 						
-						Logger.info("Received callback from the cut editor dialog. (hashasDoneOptimization? %s)", hasDoneOptimization);
+						Logger.info("Received callback from the cut editor dialog. (hasDoneOptimization? %s)", hasDoneOptimization);
 					}
 					
 					@Override
