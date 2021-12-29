@@ -32,7 +32,7 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import caceresenzo.apps.barcutoptimizer.BarCutOptimizer;
 import caceresenzo.apps.barcutoptimizer.assets.Assets;
 import caceresenzo.apps.barcutoptimizer.config.I18n;
-import caceresenzo.apps.barcutoptimizer.logic.algorithms.implementations.FillingCutAlgorithm;
+import caceresenzo.apps.barcutoptimizer.logic.algorithms.impl.FillingCutAlgorithm;
 import caceresenzo.apps.barcutoptimizer.logic.exporter.DataExporter;
 import caceresenzo.apps.barcutoptimizer.logic.exporter.ExporterCallback;
 import caceresenzo.apps.barcutoptimizer.models.BarReference;
@@ -82,11 +82,11 @@ public class PdfDataExporter implements DataExporter {
 	/* Variables */
 	private PDDocument document;
 	private PDFont font;
-	private PDPage lastestPage;
 	
 	private final List<File> temporaryFiles;
 	
 	/* Constructor */
+	@SuppressWarnings("serial")
 	public PdfDataExporter() {
 		this.temporaryFiles = new ArrayList<File>() {
 			@Override
@@ -97,7 +97,6 @@ public class PdfDataExporter implements DataExporter {
 		};
 	}
 	
-	@SuppressWarnings("unused")
 	@Override
 	public void exportToFile(List<BarReference> barReferences, File file) throws Exception {
 		notifyInitialization();
@@ -433,7 +432,7 @@ public class PdfDataExporter implements DataExporter {
 	 * @return The {@link PDPage page} just created.
 	 */
 	private PDPage createPage() {
-		PDPage page = lastestPage = new PDPage();
+		PDPage page = new PDPage();
 		document.addPage(page);
 		
 		return page;
@@ -901,17 +900,17 @@ public class PdfDataExporter implements DataExporter {
 	static List<CutTableInput> getRandomCuts() {
 		List<CutTableInput> cutTableInputs = new ArrayList<>();
 		
-//		Random random = new Random();
-//		
-//		for (int i = 0; i < 10; i++) {
-//			CutTableInput cutTableInput = new CutTableInput();
-//			
-//			cutTableInput.setLength(Randomizer.nextRangeInt(500, 2500));
-//			cutTableInput.setQuantity(Randomizer.nextRangeInt(1, 8));
-//			cutTableInput.setCutAngles(new int[] { random.nextBoolean() ? 90 : 45, random.nextBoolean() ? 90 : 45 });
-//			
-//			cutTableInputs.add(cutTableInput);
-//		}
+		// Random random = new Random();
+		//
+		// for (int i = 0; i < 10; i++) {
+		// CutTableInput cutTableInput = new CutTableInput();
+		//
+		// cutTableInput.setLength(Randomizer.nextRangeInt(500, 2500));
+		// cutTableInput.setQuantity(Randomizer.nextRangeInt(1, 8));
+		// cutTableInput.setCutAngles(new int[] { random.nextBoolean() ? 90 : 45, random.nextBoolean() ? 90 : 45 });
+		//
+		// cutTableInputs.add(cutTableInput);
+		// }
 		
 		return cutTableInputs;
 	}

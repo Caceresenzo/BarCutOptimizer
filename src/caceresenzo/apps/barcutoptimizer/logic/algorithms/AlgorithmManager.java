@@ -9,7 +9,7 @@ import java.util.Objects;
 
 import caceresenzo.apps.barcutoptimizer.config.I18n;
 import caceresenzo.apps.barcutoptimizer.logic.algorithms.annotations.AlgorithmSetting;
-import caceresenzo.apps.barcutoptimizer.logic.algorithms.implementations.FillingCutAlgorithm;
+import caceresenzo.apps.barcutoptimizer.logic.algorithms.impl.FillingCutAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -45,15 +45,13 @@ public class AlgorithmManager {
 	
 	private void extractSettingEntries(CutAlgorithm cutAlgorithm) {
 		Class<? extends CutAlgorithm> clazz = cutAlgorithm.getClass();
-		Field[] fields = clazz.getFields();
+		Field[] fields = clazz.getDeclaredFields();
 		
 		for (Field field : fields) {
 			AlgorithmSetting algorithmSetting = field.getAnnotation(AlgorithmSetting.class);
 			
 			if (algorithmSetting != null) {
 				log.info("Found setting: {}", algorithmSetting.key());
-				
-				// ReflectionUtils.silentlyRemoveFinalProtection(field);
 				
 				settingEntries.get(cutAlgorithm).add(new AlgorithmSettingEntry(cutAlgorithm, field, algorithmSetting));
 			}
@@ -77,7 +75,7 @@ public class AlgorithmManager {
 	}
 	
 	public static String getBaseTranslationKey(AlgorithmSettingEntry algorithmSettingEntry) {
-		return getBaseTranslationKey(algorithmSettingEntry.getAlgorithmInstance()) + ".setting." + algorithmSettingEntry.getI18nKey();
+		return getBaseTranslationKey(algorithmSettingEntry.getInstance()) + ".setting." + algorithmSettingEntry.getI18nKey();
 	}
 	
 	public static String getTranslatedName(AlgorithmSettingEntry algorithmSettingEntry) {
@@ -100,7 +98,7 @@ public class AlgorithmManager {
 	public static class AlgorithmSettingEntry {
 		
 		/* Variables */
-		private final CutAlgorithm algorithmInstance;
+		private final CutAlgorithm instance;
 		private final Field field;
 		private final AlgorithmSetting algorithmSetting;
 		private final String i18nKey;
@@ -108,7 +106,7 @@ public class AlgorithmManager {
 		
 		/* Constructor */
 		public AlgorithmSettingEntry(CutAlgorithm algorithmInstance, Field field, AlgorithmSetting algorithmSetting) {
-			this.algorithmInstance = algorithmInstance;
+			this.instance = algorithmInstance;
 			this.field = field;
 			this.algorithmSetting = algorithmSetting;
 			
@@ -118,8 +116,8 @@ public class AlgorithmManager {
 			field.setAccessible(true);
 		}
 		
-		public CutAlgorithm getAlgorithmInstance() {
-			return algorithmInstance;
+		public CutAlgorithm getInstance() {
+			return instance;
 		}
 		
 		public Field getField() {
@@ -140,7 +138,7 @@ public class AlgorithmManager {
 		
 		public Object getValue() {
 			try {
-				return field.get(algorithmInstance);
+				return field.get(instance);
 			} catch (IllegalArgumentException | IllegalAccessException exception) {
 				throw new RuntimeException("Unexpected exception when getting field value.", exception);
 			}
@@ -148,8 +146,7 @@ public class AlgorithmManager {
 		
 		public boolean setValue(Object value) {
 			try {
-				// ReflectionUtils.setFinal(field, Modifier.isStatic(field.getModifiers()) ? null : algorithmInstance, value);
-				// field.set(Modifier.isStatic(field.getModifiers()) ? null : algorithmInstance, value);
+				field.set(instance, value);
 				
 				return true;
 			} catch (Exception exception) {

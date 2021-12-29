@@ -1,4 +1,4 @@
-package caceresenzo.apps.barcutoptimizer.logic.algorithms.implementations;
+package caceresenzo.apps.barcutoptimizer.logic.algorithms.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,13 +14,13 @@ import caceresenzo.apps.barcutoptimizer.models.UnoptimizedCutList;
 public class FillingCutAlgorithm implements CutAlgorithm {
 	
 	@AlgorithmSetting(key = "start-offset")
-	public static final double START_OFFSET = 50.0d;
+	private double startOffset = 50.0d;
 	
 	@AlgorithmSetting(key = "end-offset")
-	public static final double END_OFFSET = 50.0d;
+	private double endOffset = 50.0d;
 	
 	@AlgorithmSetting(key = "cut-offset")
-	public static final double CUT_OFFSET = 10.0d;
+	private double cutOffset = 10.0d;
 	
 	@Override
 	public List<CutGroup> optimize(UnoptimizedCutList unoptimizedCutList) {
@@ -30,7 +30,7 @@ public class FillingCutAlgorithm implements CutAlgorithm {
 		final List<Cut> cuts = new ArrayList<>(unoptimizedCutList.getCuts());
 		Cut.sortByLengthAndAngles(cuts);
 		
-		final double usableBarLength = barLength - START_OFFSET - END_OFFSET;
+		final double usableBarLength = barLength - startOffset - endOffset;
 		if (usableBarLength <= 0) {
 			throw new IllegalStateException("Usable bar length is under or equal to 0, can't continue.");
 		}
