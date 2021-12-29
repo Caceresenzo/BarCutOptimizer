@@ -40,7 +40,10 @@ import javax.swing.event.DocumentListener;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import javax.swing.table.AbstractTableModel;
 
+import org.apache.commons.lang3.math.NumberUtils;
+
 import caceresenzo.apps.barcutoptimizer.config.Constants;
+import caceresenzo.apps.barcutoptimizer.config.I18n;
 import caceresenzo.apps.barcutoptimizer.logic.algorithms.AlgorithmManager;
 import caceresenzo.apps.barcutoptimizer.logic.algorithms.AlgorithmManager.AlgorithmSettingEntry;
 import caceresenzo.apps.barcutoptimizer.logic.algorithms.CutAlgorithm;
@@ -48,9 +51,8 @@ import caceresenzo.apps.barcutoptimizer.models.BarReference;
 import caceresenzo.apps.barcutoptimizer.models.CutTableInput;
 import caceresenzo.apps.barcutoptimizer.models.UnoptimizedCutList;
 import caceresenzo.apps.barcutoptimizer.ui.components.AlgorithmSettingPanel;
-import caceresenzo.libs.internationalization.i18n;
-import caceresenzo.libs.parse.ParseUtils;
 
+@SuppressWarnings("serial")
 public class CutsEditionDialog extends JDialog implements Constants {
 	
 	/* Constants */
@@ -94,22 +96,22 @@ public class CutsEditionDialog extends JDialog implements Constants {
 		setMinimumSize(getSize());
 		setResizable(true);
 		setLocationRelativeTo(null);
-		setTitle(i18n.string("cut-editor.frame.title"));
+		setTitle(I18n.string("cut-editor.frame.title"));
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		
 		JScrollPane tableScrollPane = new JScrollPane();
-		tableScrollPane.setBorder(new TitledBorder(null, i18n.string("cut-editor.panel.data"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		tableScrollPane.setBorder(new TitledBorder(null, I18n.string("cut-editor.panel.data"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
 		JPanel algorithmPanel = new JPanel();
-		algorithmPanel.setBorder(new TitledBorder(null, i18n.string("cut-editor.panel.algorithm"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		algorithmPanel.setBorder(new TitledBorder(null, I18n.string("cut-editor.panel.algorithm"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
 		barLengthPanel = new JPanel();
-		barLengthPanel.setBorder(new TitledBorder(null, i18n.string("cut-editor.panel.bar-length"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		barLengthPanel.setBorder(new TitledBorder(null, I18n.string("cut-editor.panel.bar-length"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
 		algorithmSettingsScrollPane = new JScrollPane();
-		algorithmSettingsScrollPane.setBorder(new TitledBorder(null, i18n.string("cut-editor.panel.algorithm-settings"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		algorithmSettingsScrollPane.setBorder(new TitledBorder(null, I18n.string("cut-editor.panel.algorithm-settings"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
 		GroupLayout gl_contentPanel = new GroupLayout(contentPanel);
 		gl_contentPanel.setHorizontalGroup(
@@ -190,11 +192,11 @@ public class CutsEditionDialog extends JDialog implements Constants {
 		contentPanel.setLayout(gl_contentPanel);
 		JPanel buttonPane = new JPanel();
 		getContentPane().add(buttonPane, BorderLayout.SOUTH);
-		okButton = new JButton(i18n.string("cut-editor.button.ok"));
-		cancelButton = new JButton(i18n.string("cut-editor.button.cancel"));
+		okButton = new JButton(I18n.string("cut-editor.button.ok"));
+		cancelButton = new JButton(I18n.string("cut-editor.button.cancel"));
 		getRootPane().setDefaultButton(okButton);
 		
-		addLineButton = new JButton(i18n.string("cut-editor.button.add-new-line"));
+		addLineButton = new JButton(I18n.string("cut-editor.button.add-new-line"));
 		addLineButton.setActionCommand("");
 		GroupLayout gl_buttonPane = new GroupLayout(buttonPane);
 		gl_buttonPane.setHorizontalGroup(
@@ -281,7 +283,7 @@ public class CutsEditionDialog extends JDialog implements Constants {
 				} catch (Exception exception) {
 					exception.printStackTrace();
 					
-					JOptionPane.showConfirmDialog(CutsEditionDialog.this, i18n.string("cut-algorithm.error.failed", exception.getLocalizedMessage()), i18n.string("dialog.error.title"), JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showConfirmDialog(CutsEditionDialog.this, I18n.string("cut-algorithm.error.failed", exception.getLocalizedMessage()), I18n.string("dialog.error.title"), JOptionPane.ERROR_MESSAGE);
 					
 					callback.onException(barReference, exception);
 				}
@@ -291,13 +293,12 @@ public class CutsEditionDialog extends JDialog implements Constants {
 		});
 	}
 	
-	@SuppressWarnings("unchecked")
 	private void initializeComboBoxes() {
 		algorithmComboBox.setModel(new DefaultComboBoxModel<>(new Vector<>(AlgorithmManager.get().getCutAlgorithms())));
 		
 		algorithmComboBox.setRenderer(new BasicComboBoxRenderer() {
 			@Override
-			public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+			public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 				
 				CutAlgorithm cutAlgorithm = (CutAlgorithm) value;
@@ -366,7 +367,7 @@ public class CutsEditionDialog extends JDialog implements Constants {
 	}
 	
 	private void updateBarLength(String text) {
-		double value = ParseUtils.parseDouble(text, INVALID_LENGTH);
+		double value = NumberUtils.toDouble(text, INVALID_LENGTH);
 		
 		if (value < 0) {
 			barLengthTextField.setForeground(Color.RED);
@@ -413,15 +414,15 @@ public class CutsEditionDialog extends JDialog implements Constants {
 		private final List<CutTableInput> cutTableInputs;
 		
 		private final String[] columnNames;
-		private final Class[] columnClass;
+		private final Class<?>[] columnClass;
 		
 		public CutTableInputTableModel(List<CutTableInput> cutInputs) {
 			this.columnNames = new String[] {
-					i18n.string("cut-editor.panel.data.table.header.column.length"),
-					i18n.string("cut-editor.panel.data.table.header.column.angle-a"),
-					i18n.string("cut-editor.panel.data.table.header.column.angle-b"),
-					i18n.string("cut-editor.panel.data.table.header.column.quantity"),
-					i18n.string("cut-editor.panel.data.table.header.column.remove"),
+					I18n.string("cut-editor.panel.data.table.header.column.length"),
+					I18n.string("cut-editor.panel.data.table.header.column.angle-a"),
+					I18n.string("cut-editor.panel.data.table.header.column.angle-b"),
+					I18n.string("cut-editor.panel.data.table.header.column.quantity"),
+					I18n.string("cut-editor.panel.data.table.header.column.remove"),
 			};
 			this.columnClass = new Class[] { Double.class, Integer.class, Integer.class, Integer.class, Boolean.class };
 			

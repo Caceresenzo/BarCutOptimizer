@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
@@ -17,6 +18,9 @@ import java.util.function.Function;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
+import org.apache.commons.io.FileSystem;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -27,7 +31,7 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 import caceresenzo.apps.barcutoptimizer.BarCutOptimizer;
 import caceresenzo.apps.barcutoptimizer.assets.Assets;
-import caceresenzo.apps.barcutoptimizer.config.Language;
+import caceresenzo.apps.barcutoptimizer.config.I18n;
 import caceresenzo.apps.barcutoptimizer.logic.algorithms.implementations.FillingCutAlgorithm;
 import caceresenzo.apps.barcutoptimizer.logic.exporter.DataExporter;
 import caceresenzo.apps.barcutoptimizer.logic.exporter.ExporterCallback;
@@ -37,12 +41,9 @@ import caceresenzo.apps.barcutoptimizer.models.CutGroup;
 import caceresenzo.apps.barcutoptimizer.models.CutTableInput;
 import caceresenzo.apps.barcutoptimizer.models.UnoptimizedCutList;
 import caceresenzo.apps.barcutoptimizer.ui.components.BarCutPanel;
-import caceresenzo.libs.filesystem.FileUtils;
-import caceresenzo.libs.internationalization.i18n;
-import caceresenzo.libs.logger.Logger;
-import caceresenzo.libs.random.Randomizer;
-import caceresenzo.libs.string.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class PdfDataExporter implements DataExporter {
 	
 	/* Callback Constants */
@@ -112,7 +113,7 @@ public class PdfDataExporter implements DataExporter {
 		
 		int globalPageCounter = 0;
 		for (BarReference barReference : barReferences) {
-			File barReferenceBaseFolder = new File(exportTemporaryFolder, FileUtils.replaceIllegalChar(barReference.getName()));
+			File barReferenceBaseFolder = new File(exportTemporaryFolder, FileSystem.getCurrent().toLegalFileName(barReference.getName(), '_'));
 			
 			List<CutGroup> cutGroups = barReference.getCutGroups();
 			ListIterator<CutGroup> iterator = cutGroups.listIterator();
@@ -163,15 +164,15 @@ public class PdfDataExporter implements DataExporter {
 							
 							int startX = PAGE_MARGIN_HORIZONTAL;
 							
-							int usedY1 = printTextColumn(contentStream, startX, inversedY, i18n.string("exporter.column.bar"), Arrays.asList(
-									i18n.string("exporter.column.bar.item.position", (localIndex + 1)),
-									i18n.string("exporter.column.bar.item.length", cutGroup.getBarLength()),
-									i18n.string("exporter.column.bar.item.size", cutGroup.getCutCount(), cutGroup.getCutCount() > 1 ? i18n.string("multiple-element-letter") : "")));
+							int usedY1 = printTextColumn(contentStream, startX, inversedY, I18n.string("exporter.column.bar"), Arrays.asList(
+									I18n.string("exporter.column.bar.item.position", (localIndex + 1)),
+									I18n.string("exporter.column.bar.item.length", cutGroup.getBarLength()),
+									I18n.string("exporter.column.bar.item.size", cutGroup.getCutCount(), cutGroup.getCutCount() > 1 ? I18n.string("multiple-element-letter") : "")));
 							
 							int usedY2 = 0; /* Set 3 times just for the look ;) */
-							usedY2 = printTextColumn(contentStream, startX + SPACE_BETWEEN_COLUMN, inversedY, i18n.string("exporter.column.length"), cutListToLines(cuts, (cut) -> StringUtils.prefill(String.valueOf(cut.getLength()), " ", 8)));
-							usedY2 = printTextColumn(contentStream, startX + SPACE_BETWEEN_COLUMN * 2, inversedY, i18n.string("exporter.column.angle.a"), cutListToLines(cuts, (cut) -> StringUtils.prefill(cut.getCutAngleA() + "°", " ", 7)));
-							usedY2 = printTextColumn(contentStream, startX + SPACE_BETWEEN_COLUMN * 3, inversedY, i18n.string("exporter.column.angle.b"), cutListToLines(cuts, (cut) -> StringUtils.prefill(cut.getCutAngleB() + "°", " ", 7)));
+							usedY2 = printTextColumn(contentStream, startX + SPACE_BETWEEN_COLUMN, inversedY, I18n.string("exporter.column.length"), cutListToLines(cuts, (cut) -> StringUtils.leftPad(String.valueOf(cut.getLength()), 8)));
+							usedY2 = printTextColumn(contentStream, startX + SPACE_BETWEEN_COLUMN * 2, inversedY, I18n.string("exporter.column.angle.a"), cutListToLines(cuts, (cut) -> StringUtils.leftPad(cut.getCutAngleA() + "°", 7)));
+							usedY2 = printTextColumn(contentStream, startX + SPACE_BETWEEN_COLUMN * 3, inversedY, I18n.string("exporter.column.angle.b"), cutListToLines(cuts, (cut) -> StringUtils.leftPad(cut.getCutAngleB() + "°", 7)));
 							
 							int usedY = Math.max(usedY1, usedY2);
 							
@@ -185,17 +186,17 @@ public class PdfDataExporter implements DataExporter {
 							
 							String barLengthString = String.valueOf(cutGroup.getRemainingBarLength());
 							if (cutGroup.isRemainingBarLengthUnknown()) {
-								barLengthString = i18n.string("exporter.warning.unknown-remaining");
+								barLengthString = I18n.string("exporter.warning.unknown-remaining");
 							}
 							
-							printSimpleText(contentStream, startX + SPACE_BETWEEN_COLUMN, (float) (inversedY - FONT_SIZE - usedY), FONT_SIZE, StringUtils.prefill(barLengthString, " ", 8));
+							printSimpleText(contentStream, startX + SPACE_BETWEEN_COLUMN, (float) (inversedY - FONT_SIZE - usedY), FONT_SIZE, StringUtils.leftPad(barLengthString, 8));
 							
 							String warningMessage = null;
 							if (cutGroup.isRemainingBarLengthUnknown()) {
-								warningMessage = i18n.string("exporter.warning.unknown-remaining.estimated", StringUtils.prefill(String.valueOf(cutGroup.estimateRemainingBarLength()), " ", 7));
+								warningMessage = I18n.string("exporter.warning.unknown-remaining.estimated", StringUtils.leftPad(String.valueOf(cutGroup.estimateRemainingBarLength()), 7));
 							} else {
 								if (ENABLE_WARNING && cutGroup.getRemainingBarLength() < LOW_REMAINING_THRESHOLD) {
-									warningMessage = i18n.string("exporter.warning.low-remaining");
+									warningMessage = I18n.string("exporter.warning.low-remaining");
 								}
 							}
 							
@@ -208,7 +209,7 @@ public class PdfDataExporter implements DataExporter {
 							currentY += usedY;
 						}
 						
-						Logger.info("Y: %-4s -> inserted image: %s", currentY, cutGroupFile.getPath());
+						log.info("Y: {} -> inserted image: {}", currentY, cutGroupFile.getPath());
 					} catch (Exception exception) {
 						exception.printStackTrace();
 					}
@@ -257,8 +258,8 @@ public class PdfDataExporter implements DataExporter {
 							
 							float textY = mediaBox.getHeight() - PAGE_MARGIN_VERTICAL - (FONT_SIZE * 3f);
 							
-							printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL, textY, FONT_SIZE, i18n.string("exporter.word.quantity").toUpperCase());
-							printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL + SMALL_SPACE_BETWEEN_COLUMN + FONT_SIZE / 2f, textY, FONT_SIZE, i18n.string("exporter.word.cut"));
+							printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL, textY, FONT_SIZE, I18n.string("exporter.word.quantity").toUpperCase());
+							printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL + SMALL_SPACE_BETWEEN_COLUMN + FONT_SIZE / 2f, textY, FONT_SIZE, I18n.string("exporter.word.cut"));
 							
 							printSimpleHorizontalLine(contentStream, PAGE_MARGIN_HORIZONTAL, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, textY - (FONT_SIZE / 2f));
 							
@@ -271,16 +272,16 @@ public class PdfDataExporter implements DataExporter {
 							/* Printing bar consumption */
 							int totalCutCount = barReference.getAllCuts().size();
 							int totalCutGroupCount = barReference.getCutGroups().size();
-							String multipleElementLetter = i18n.string("multiple-element-letter");
+							String multipleElementLetter = I18n.string("multiple-element-letter");
 							
-							String consumptionText = i18n.string("exporter.message.consumption", totalCutCount, totalCutCount > 1 ? multipleElementLetter : "", totalCutGroupCount, totalCutGroupCount > 1 ? multipleElementLetter : "");
+							String consumptionText = I18n.string("exporter.message.consumption", totalCutCount, totalCutCount > 1 ? multipleElementLetter : "", totalCutGroupCount, totalCutGroupCount > 1 ? multipleElementLetter : "");
 							printSimpleText(contentStream, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL - computeStringWidth(consumptionText), textY, FONT_SIZE, consumptionText.toUpperCase());
 						}
 						
 						float inversedY = mediaBox.getHeight() - currentY;
 						
-						printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL, inversedY, FONT_SIZE, StringUtils.prefill(String.format("%sx", count), " ", 8));
-						printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL + SMALL_SPACE_BETWEEN_COLUMN + FONT_SIZE / 2f, inversedY, FONT_SIZE, String.format("%-7s    %2s° / %2s°", StringUtils.prefill(String.valueOf(cut.getLength()), " ", 7), cut.getCutAngleA(), cut.getCutAngleB()));
+						printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL, inversedY, FONT_SIZE, StringUtils.leftPad(String.format("%sx", count), 8));
+						printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL + SMALL_SPACE_BETWEEN_COLUMN + FONT_SIZE / 2f, inversedY, FONT_SIZE, String.format("%-7s    %2s° / %2s°", StringUtils.leftPad(String.valueOf(cut.getLength()), 7), cut.getCutAngleA(), cut.getCutAngleB()));
 						
 						if (ADD_LINE_BETWEEN_CELL_IN_COUNT_TABLE && cutIterator.hasNext()) {
 							printSimpleHorizontalLine(contentStream, PAGE_MARGIN_HORIZONTAL, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, (float) (inversedY - FONT_SIZE * 0.4f), 0.1f);
@@ -333,8 +334,8 @@ public class PdfDataExporter implements DataExporter {
 							
 							float textY = mediaBox.getHeight() - PAGE_MARGIN_VERTICAL - (FONT_SIZE * 3f);
 							
-							printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL, textY, FONT_SIZE, i18n.string("exporter.word.quantity").toUpperCase());
-							printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL + SMALL_SPACE_BETWEEN_COLUMN + FONT_SIZE / 2f, textY, FONT_SIZE, i18n.string("exporter.word.leftover"));
+							printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL, textY, FONT_SIZE, I18n.string("exporter.word.quantity").toUpperCase());
+							printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL + SMALL_SPACE_BETWEEN_COLUMN + FONT_SIZE / 2f, textY, FONT_SIZE, I18n.string("exporter.word.leftover"));
 							
 							printSimpleHorizontalLine(contentStream, PAGE_MARGIN_HORIZONTAL, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, textY - (FONT_SIZE / 2f));
 							
@@ -347,8 +348,8 @@ public class PdfDataExporter implements DataExporter {
 						
 						float inversedY = mediaBox.getHeight() - currentY;
 						
-						printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL, inversedY, FONT_SIZE, StringUtils.prefill(String.format("%sx", count), " ", 8));
-						printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL + SMALL_SPACE_BETWEEN_COLUMN + FONT_SIZE / 2f, inversedY, FONT_SIZE, String.format("%-7s", StringUtils.prefill(String.valueOf(remainingLength), " ", 7)));
+						printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL, inversedY, FONT_SIZE, StringUtils.leftPad(String.format("%sx", count), 8));
+						printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL + SMALL_SPACE_BETWEEN_COLUMN + FONT_SIZE / 2f, inversedY, FONT_SIZE, String.format("%-7s", StringUtils.leftPad(String.valueOf(remainingLength), 7)));
 						
 						if (ADD_LINE_BETWEEN_CELL_IN_COUNT_TABLE && remainingIterator.hasNext()) {
 							printSimpleHorizontalLine(contentStream, PAGE_MARGIN_HORIZONTAL, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, (float) (inversedY - FONT_SIZE * 0.4f), 0.1f);
@@ -461,8 +462,8 @@ public class PdfDataExporter implements DataExporter {
 				graphics.dispose();
 				
 				return bufferedImage;
-			} catch (Exception exception) {
-				Logger.warning("javax.swing.RepaintManager.getVolatileOffscreenBuffer() -> java.lang.NullPointerException");
+			} catch (NullPointerException exception) {
+				log.warn("javax.swing.RepaintManager.getVolatileOffscreenBuffer() -> java.lang.NullPointerException");
 				// exception.printStackTrace();
 			}
 		}
@@ -480,7 +481,11 @@ public class PdfDataExporter implements DataExporter {
 	 *             If an error occurs during writing.
 	 */
 	private void saveCutGroupPicture(CutGroup cutGroup, File file) throws IOException {
-		FileUtils.forceFileCreation(file);
+		if (!file.exists()) {
+			FileUtils.createParentDirectories(file);
+			file.createNewFile();
+		}
+		
 		ImageIO.write(renderCutGroup(cutGroup), "png", file);
 		
 		temporaryFiles.add(file);
@@ -728,7 +733,7 @@ public class PdfDataExporter implements DataExporter {
 	 *             If there is an error writing to the stream.
 	 */
 	private void printHeader(PDPageContentStream contentStream, PDRectangle mediaBox, BarReference barReference) throws IOException {
-		printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL, mediaBox.getHeight() - PAGE_MARGIN_VERTICAL - FONT_SIZE, (float) (FONT_SIZE * 1.5), i18n.string("exporter.word.bar-reference.format", barReference.getName()));
+		printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL, mediaBox.getHeight() - PAGE_MARGIN_VERTICAL - FONT_SIZE, (float) (FONT_SIZE * 1.5), I18n.string("exporter.word.bar-reference.format", barReference.getName()));
 		printSimpleHorizontalLine(contentStream, PAGE_MARGIN_HORIZONTAL, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, (float) (mediaBox.getHeight() - PAGE_MARGIN_VERTICAL - (FONT_SIZE * 1.4)));
 	}
 	
@@ -746,7 +751,7 @@ public class PdfDataExporter implements DataExporter {
 		float baseY = PAGE_MARGIN_VERTICAL / 2f;
 		float fontSize = (float) (FONT_SIZE * 0.6);
 		
-		String[] lines = i18n.string("application.copyright.full").split("\n");
+		String[] lines = I18n.string("application.copyright.full").split("\n");
 		for (int index = 0; index < lines.length; index++) {
 			String line = lines[index];
 			
@@ -774,7 +779,7 @@ public class PdfDataExporter implements DataExporter {
 	 *             If there is an error writing to the stream.
 	 */
 	private void printPageFooter(PDPageContentStream contentStream, PDRectangle mediaBox, int globalPageCounter, int localPageCounter) throws IOException {
-		printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL, PAGE_MARGIN_VERTICAL * 0.8f, (float) (FONT_SIZE * 0.8), i18n.string("exporter.footer.page", localPageCounter + 1, globalPageCounter + 1));
+		printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL, PAGE_MARGIN_VERTICAL * 0.8f, (float) (FONT_SIZE * 0.8), I18n.string("exporter.footer.page", localPageCounter + 1, globalPageCounter + 1));
 	}
 	
 	/**
@@ -809,7 +814,12 @@ public class PdfDataExporter implements DataExporter {
 			publishProgress(index, total);
 		}
 		
-		FileUtils.deleteTree(temporaryFolder);
+		try {
+			FileUtils.deleteDirectory(temporaryFolder);
+		} catch (IOException exception) {
+			log.warn("Could not delete temporary folder", exception);
+		}
+		
 		publishProgress(total, total);
 	}
 	
@@ -869,7 +879,7 @@ public class PdfDataExporter implements DataExporter {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		Language.get().initialize();
+		I18n.load(Locale.FRENCH);
 		File file = new File("null.pdf");
 		
 		BarReference dummy = new BarReference("Hello", new ArrayList<>());
@@ -891,17 +901,17 @@ public class PdfDataExporter implements DataExporter {
 	static List<CutTableInput> getRandomCuts() {
 		List<CutTableInput> cutTableInputs = new ArrayList<>();
 		
-		for (int i = 0; i < 10; i++) {
-			CutTableInput cutTableInput = new CutTableInput();
-			
-			Random random = new Random();
-			
-			cutTableInput.setLength(Randomizer.nextRangeInt(500, 2500));
-			cutTableInput.setQuantity(Randomizer.nextRangeInt(1, 8));
-			cutTableInput.setCutAngles(new int[] { random.nextBoolean() ? 90 : 45, random.nextBoolean() ? 90 : 45 });
-			
-			cutTableInputs.add(cutTableInput);
-		}
+//		Random random = new Random();
+//		
+//		for (int i = 0; i < 10; i++) {
+//			CutTableInput cutTableInput = new CutTableInput();
+//			
+//			cutTableInput.setLength(Randomizer.nextRangeInt(500, 2500));
+//			cutTableInput.setQuantity(Randomizer.nextRangeInt(1, 8));
+//			cutTableInput.setCutAngles(new int[] { random.nextBoolean() ? 90 : 45, random.nextBoolean() ? 90 : 45 });
+//			
+//			cutTableInputs.add(cutTableInput);
+//		}
 		
 		return cutTableInputs;
 	}

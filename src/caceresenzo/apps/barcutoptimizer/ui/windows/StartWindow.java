@@ -8,10 +8,10 @@ import javax.swing.JPanel;
 
 import caceresenzo.apps.barcutoptimizer.BarCutOptimizer;
 import caceresenzo.apps.barcutoptimizer.assets.Assets;
+import caceresenzo.apps.barcutoptimizer.config.I18n;
 import caceresenzo.apps.barcutoptimizer.ui.components.BigButton;
 import caceresenzo.apps.barcutoptimizer.ui.others.CreateNewDialogs;
 import caceresenzo.apps.barcutoptimizer.ui.others.ImportDialogs;
-import caceresenzo.libs.internationalization.i18n;
 
 public class StartWindow {
 	
@@ -41,7 +41,7 @@ public class StartWindow {
 	private void initialize() {
 		frame = new JFrame();
 		frame.setSize(480, 300);
-		frame.setTitle(i18n.string("application.title"));
+		frame.setTitle(I18n.string("application.title"));
 		frame.setLocationRelativeTo(null);
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -51,10 +51,10 @@ public class StartWindow {
 		frame.getContentPane().add(panel);
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		
-		newBigButton = new BigButton(i18n.string("start-window.button.new.html"), Assets.ICON_CREATE, (bigButton) -> CreateNewDialogs.get().openEditor());
+		newBigButton = new BigButton(I18n.string("start-window.button.new.html"), Assets.ICON_CREATE, (bigButton) -> CreateNewDialogs.get().openEditor());
 		panel.add(newBigButton);
 		
-		importBigButton = new BigButton(i18n.string("start-window.button.import.html"), Assets.ICON_PDF, (bigButton) -> ImportDialogs.get().startImportationProcess());
+		importBigButton = new BigButton(I18n.string("start-window.button.import.html"), Assets.ICON_PDF, (bigButton) -> ImportDialogs.get().startImportationProcess());
 		panel.add(importBigButton);
 	}
 	

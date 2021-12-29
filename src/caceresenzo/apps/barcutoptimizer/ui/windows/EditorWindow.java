@@ -6,9 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.BoxLayout;
@@ -24,7 +22,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.SwingUtilities;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -38,9 +35,7 @@ import javax.swing.tree.TreeSelectionModel;
 
 import caceresenzo.apps.barcutoptimizer.assets.Assets;
 import caceresenzo.apps.barcutoptimizer.config.Constants;
-import caceresenzo.apps.barcutoptimizer.logic.exporter.DataExporter;
-import caceresenzo.apps.barcutoptimizer.logic.exporter.ExporterCallback;
-import caceresenzo.apps.barcutoptimizer.logic.exporter.implementations.PdfDataExporter;
+import caceresenzo.apps.barcutoptimizer.config.I18n;
 import caceresenzo.apps.barcutoptimizer.models.BarReference;
 import caceresenzo.apps.barcutoptimizer.models.Cut;
 import caceresenzo.apps.barcutoptimizer.models.CutGroup;
@@ -49,9 +44,9 @@ import caceresenzo.apps.barcutoptimizer.ui.components.CutGroupPanel;
 import caceresenzo.apps.barcutoptimizer.ui.dialogs.CutsEditionDialog;
 import caceresenzo.apps.barcutoptimizer.ui.dialogs.ExportDialog;
 import caceresenzo.apps.barcutoptimizer.ui.others.NewBarReferenceDialogs;
-import caceresenzo.libs.internationalization.i18n;
-import caceresenzo.libs.logger.Logger;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class EditorWindow implements Constants {
 	
 	/* Components */
@@ -86,18 +81,18 @@ public class EditorWindow implements Constants {
 		frame.setMinimumSize(new Dimension(800, 500));
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setTitle(i18n.string("application.title"));
+		frame.setTitle(I18n.string("application.title"));
 		
 		JScrollPane treeScrollPanel = new JScrollPane();
 		treeScrollPanel.setViewportBorder(null);
 		
 		cutGroupListScrollPanel = new JScrollPane();
 		
-		addNewBarReferenceButton = new JButton(i18n.string("editor.button.add-new-bar-reference"));
+		addNewBarReferenceButton = new JButton(I18n.string("editor.button.add-new-bar-reference"));
 		
-		exportButton = new JButton(i18n.string("editor.button.export"));
+		exportButton = new JButton(I18n.string("editor.button.export"));
 		
-		editCutsButton = new JButton(i18n.string("editor.button.edit-cuts"));
+		editCutsButton = new JButton(I18n.string("editor.button.edit-cuts"));
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(
 				groupLayout.createParallelGroup(Alignment.LEADING)
@@ -136,7 +131,7 @@ public class EditorWindow implements Constants {
 		
 		cutGroupListScrollPanel.getVerticalScrollBar().setUnitIncrement(20);
 		
-		rootNode = new DefaultMutableTreeNode(i18n.string("editor.tree.root"));
+		rootNode = new DefaultMutableTreeNode(I18n.string("editor.tree.root"));
 		tree = new JTree(rootNode);
 		tree.setBorder(null);
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -168,19 +163,19 @@ public class EditorWindow implements Constants {
 					if (object instanceof BarReference) {
 						BarReference barReference = (BarReference) object;
 						
-						label.setText(i18n.string("editor.tree.item.bar-reference.format", barReference.getName()));
+						label.setText(I18n.string("editor.tree.item.bar-reference.format", barReference.getName()));
 					}
 					
 					if (object instanceof CutGroup) {
 						CutGroup cutGroup = (CutGroup) object;
 						
-						label.setText(i18n.string("editor.tree.item.cut-group.format", cutGroup.getBarLength(), cutGroup.getCutCount()));
+						label.setText(I18n.string("editor.tree.item.cut-group.format", cutGroup.getBarLength(), cutGroup.getCutCount()));
 					}
 					
 					if (object instanceof Cut) {
 						Cut cut = (Cut) object;
 						
-						label.setText(i18n.string("editor.tree.item.cut.format", cut.getLength(), cut.getCutAngleA(), cut.getCutAngleB()));
+						label.setText(I18n.string("editor.tree.item.cut.format", cut.getLength(), cut.getCutAngleA(), cut.getCutAngleB()));
 					}
 				}
 				
@@ -257,7 +252,7 @@ public class EditorWindow implements Constants {
 							displayBarReference(barReference);
 						}
 						
-						Logger.info("Received callback from the cut editor dialog. (hasDoneOptimization? %s)", hasDoneOptimization);
+						log.debug("Received callback from the cut editor dialog. (hasDoneOptimization? {})", hasDoneOptimization);
 					}
 					
 					@Override
@@ -380,7 +375,7 @@ public class EditorWindow implements Constants {
 		Object userObject = defaultMutableTreeNode.getUserObject();
 		
 		if (rootNode.equals(defaultMutableTreeNode)) {
-			JMenuItem emptyMenuItem = new JMenuItem(i18n.string("editor.tree.popup-menu.item.empty"), new ImageIcon(EditorWindow.class.getResource(Assets.ICON_SHREDDER_SMALL)));
+			JMenuItem emptyMenuItem = new JMenuItem(I18n.string("editor.tree.popup-menu.item.empty"), new ImageIcon(EditorWindow.class.getResource(Assets.ICON_SHREDDER_SMALL)));
 			emptyMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent event) {
@@ -413,7 +408,7 @@ public class EditorWindow implements Constants {
 			final CutGroup finalCutGroup = cutGroup;
 			final BarReference finalBarReference = barReference;
 			
-			JMenuItem deleteMenuItem = new JMenuItem(i18n.string("editor.tree.popup-menu.item.remove"), new ImageIcon(EditorWindow.class.getResource(Assets.ICON_DELETE_SMALL)));
+			JMenuItem deleteMenuItem = new JMenuItem(I18n.string("editor.tree.popup-menu.item.remove"), new ImageIcon(EditorWindow.class.getResource(Assets.ICON_DELETE_SMALL)));
 			deleteMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent event) {

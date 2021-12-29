@@ -2,6 +2,7 @@ package caceresenzo.apps.barcutoptimizer;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.util.Locale;
 
 import javax.swing.JOptionPane;
 
@@ -12,14 +13,14 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.lang3.StringUtils;
 
-import caceresenzo.apps.barcutoptimizer.config.Language;
+import caceresenzo.apps.barcutoptimizer.config.I18n;
 import caceresenzo.apps.barcutoptimizer.logic.algorithms.AlgorithmManager;
 import caceresenzo.apps.barcutoptimizer.ui.BarCutOptimizerWindow;
-import caceresenzo.libs.internationalization.i18n;
-import caceresenzo.libs.logger.Logger;
-import caceresenzo.libs.string.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class BarCutOptimizer {
 	
 	public static final File JAR_FILE;
@@ -43,11 +44,10 @@ public class BarCutOptimizer {
 	}
 	
 	public static void main(String[] args) {
-		Logger.setStaticLength(20);
+		I18n.load(Locale.FRENCH);
 		
 		File fileToOpen = parseCommandLineInterface(args);
 		
-		Language.get().initialize();
 		AlgorithmManager.get().initialize();
 		BarCutOptimizerWindow.get().initialize();
 		
@@ -71,18 +71,18 @@ public class BarCutOptimizer {
 		try {
 			commandLine = parser.parse(options, args);
 		} catch (ParseException exception) {
-			Logger.exception(exception, "Failed to parse command line.");
+			log.error("Failed to parse command line", exception);
 			
-			formatter.printHelp(i18n.string("application.title"), options);
+			formatter.printHelp(I18n.string("application.title"), options);
 			
-			JOptionPane.showMessageDialog(null, i18n.getString("error.parse-cli", exception.getLocalizedMessage()), i18n.getString("dialog.error.title"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, I18n.string("error.parse-cli", exception.getLocalizedMessage()), I18n.string("dialog.error.title"), JOptionPane.ERROR_MESSAGE);
 			
 			System.exit(1);
 		}
 		
 		String filePath = commandLine.getOptionValue(inputOption.getLongOpt());
 		
-		if (StringUtils.validate(filePath)) {
+		if (StringUtils.isNotBlank(filePath)) {
 			return new File(filePath);
 		}
 		

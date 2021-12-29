@@ -10,8 +10,8 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 
+import caceresenzo.apps.barcutoptimizer.config.I18n;
 import caceresenzo.apps.barcutoptimizer.models.CutGroup;
-import caceresenzo.libs.internationalization.i18n;
 
 public class CutGroupPanel extends JPanel {
 	
@@ -28,7 +28,7 @@ public class CutGroupPanel extends JPanel {
 		setSize(250, 110);
 		setBackground(UIManager.getColor("Tree.textBackground"));
 		
-		JLabel cutGroupTitleLabel = new JLabel(i18n.string("editor.list.item.cut-group.title.format" + (cutGroup.isRemainingBarLengthUnknown() ? ".without-remaining" : ""), cutGroup.getBarLength(), cutGroup.getCutCount(), cutGroup.getRemainingBarLength()));
+		JLabel cutGroupTitleLabel = new JLabel(I18n.string("editor.list.item.cut-group.title.format" + (cutGroup.isRemainingBarLengthUnknown() ? ".without-remaining" : ""), cutGroup.getBarLength(), cutGroup.getCutCount(), cutGroup.getRemainingBarLength()));
 		cutGroupTitleLabel.setFont(cutGroupTitleLabel.getFont().deriveFont(cutGroupTitleLabel.getFont().getSize() + 8f));
 		
 		JLabel cutListLabel = new JLabel("");

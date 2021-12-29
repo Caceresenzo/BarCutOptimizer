@@ -11,8 +11,8 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 
+import caceresenzo.apps.barcutoptimizer.config.I18n;
 import caceresenzo.apps.barcutoptimizer.models.BarReference;
-import caceresenzo.libs.internationalization.i18n;
 
 public class BarReferenceInfoPanel extends JPanel {
 	
@@ -30,13 +30,13 @@ public class BarReferenceInfoPanel extends JPanel {
 	public BarReferenceInfoPanel(BarReference barReference) {
 		this.barReference = barReference;
 		
-		setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), i18n.string("editor.list.item.bar-reference-information.title"), TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), I18n.string("editor.list.item.bar-reference-information.title"), TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		setSize(300, 90);
 		// setMaximumSize(getSize());
 		// setPreferredSize(getSize());
 		setBackground(UIManager.getColor("Tree.textBackground"));
 		
-		consumedBarLabel = new JLabel(i18n.string("editor.list.item.bar-reference-information.item.consumed-bar-count"));
+		consumedBarLabel = new JLabel(I18n.string("editor.list.item.bar-reference-information.item.consumed-bar-count"));
 		
 		consumedBarTextField = new JTextField();
 		consumedBarTextField.setEditable(false);
@@ -46,7 +46,7 @@ public class BarReferenceInfoPanel extends JPanel {
 		totalCutsTextField.setEditable(false);
 		totalCutsTextField.setColumns(10);
 		
-		JLabel totalCutsLabel = new JLabel(i18n.string("editor.list.item.bar-reference-information.item.total-cuts-count"));
+		JLabel totalCutsLabel = new JLabel(I18n.string("editor.list.item.bar-reference-information.item.total-cuts-count"));
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)

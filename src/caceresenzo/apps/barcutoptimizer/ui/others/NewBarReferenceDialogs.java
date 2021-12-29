@@ -4,10 +4,11 @@ import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
+import org.apache.commons.lang3.StringUtils;
+
+import caceresenzo.apps.barcutoptimizer.config.I18n;
 import caceresenzo.apps.barcutoptimizer.models.BarReference;
 import caceresenzo.apps.barcutoptimizer.ui.BarCutOptimizerWindow;
-import caceresenzo.libs.internationalization.i18n;
-import caceresenzo.libs.string.StringUtils;
 
 public class NewBarReferenceDialogs {
 	
@@ -20,9 +21,9 @@ public class NewBarReferenceDialogs {
 	}
 	
 	public BarReference openBarReferenceCreationDialog() {
-		String name = JOptionPane.showInputDialog(BarCutOptimizerWindow.get().getWindow(), i18n.string("dialog.new-bar-reference.message"));
+		String name = JOptionPane.showInputDialog(BarCutOptimizerWindow.get().getWindow(), I18n.string("dialog.new-bar-reference.message"));
 		
-		if (!StringUtils.validate(name)) {
+		if (StringUtils.isBlank(name)) {
 			return null;
 		}
 		

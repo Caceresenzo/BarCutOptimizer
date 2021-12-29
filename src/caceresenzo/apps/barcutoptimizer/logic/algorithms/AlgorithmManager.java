@@ -1,19 +1,18 @@
 package caceresenzo.apps.barcutoptimizer.logic.algorithms;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import caceresenzo.apps.barcutoptimizer.config.I18n;
 import caceresenzo.apps.barcutoptimizer.logic.algorithms.annotations.AlgorithmSetting;
 import caceresenzo.apps.barcutoptimizer.logic.algorithms.implementations.FillingCutAlgorithm;
-import caceresenzo.libs.internationalization.i18n;
-import caceresenzo.libs.logger.Logger;
-import caceresenzo.libs.reflection.ReflectionUtils;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class AlgorithmManager {
 	
 	/* Singleton */
@@ -38,7 +37,7 @@ public class AlgorithmManager {
 	private void register(CutAlgorithm cutAlgorithm) {
 		Objects.requireNonNull(cutAlgorithm);
 		
-		Logger.info("Added algorithm: %s", cutAlgorithm.getClass().getSimpleName());
+		log.info("Added algorithm: {}", cutAlgorithm.getClass().getSimpleName());
 		
 		algorithms.add(cutAlgorithm);
 		settingEntries.put(cutAlgorithm, new ArrayList<>());
@@ -52,9 +51,9 @@ public class AlgorithmManager {
 			AlgorithmSetting algorithmSetting = field.getAnnotation(AlgorithmSetting.class);
 			
 			if (algorithmSetting != null) {
-				Logger.info("From algorithm: %s, found setting: %s", cutAlgorithm.getClass().getSimpleName(), algorithmSetting.key());
+				log.info("Found setting: {}", algorithmSetting.key());
 				
-				ReflectionUtils.silentlyRemoveFinalProtection(field);
+				// ReflectionUtils.silentlyRemoveFinalProtection(field);
 				
 				settingEntries.get(cutAlgorithm).add(new AlgorithmSettingEntry(cutAlgorithm, field, algorithmSetting));
 			}
@@ -70,11 +69,11 @@ public class AlgorithmManager {
 	}
 	
 	public static String getTranslatedName(CutAlgorithm cutAlgorithm) {
-		return i18n.string(getBaseTranslationKey(cutAlgorithm) + ".name");
+		return I18n.string(getBaseTranslationKey(cutAlgorithm) + ".name");
 	}
 	
 	public static String getTranslatedDescription(CutAlgorithm cutAlgorithm) {
-		return i18n.string(getBaseTranslationKey(cutAlgorithm) + ".description");
+		return I18n.string(getBaseTranslationKey(cutAlgorithm) + ".description");
 	}
 	
 	public static String getBaseTranslationKey(AlgorithmSettingEntry algorithmSettingEntry) {
@@ -82,11 +81,11 @@ public class AlgorithmManager {
 	}
 	
 	public static String getTranslatedName(AlgorithmSettingEntry algorithmSettingEntry) {
-		return i18n.string(getBaseTranslationKey(algorithmSettingEntry) + ".name");
+		return I18n.string(getBaseTranslationKey(algorithmSettingEntry) + ".name");
 	}
 	
 	public static String getTranslatedDescription(AlgorithmSettingEntry algorithmSettingEntry) {
-		return i18n.string(getBaseTranslationKey(algorithmSettingEntry) + ".description");
+		return I18n.string(getBaseTranslationKey(algorithmSettingEntry) + ".description");
 	}
 	
 	/** @return AlgorithmManager's singleton instance. */
@@ -149,7 +148,7 @@ public class AlgorithmManager {
 		
 		public boolean setValue(Object value) {
 			try {
-				ReflectionUtils.setFinal(field, Modifier.isStatic(field.getModifiers()) ? null : algorithmInstance, value);
+				// ReflectionUtils.setFinal(field, Modifier.isStatic(field.getModifiers()) ? null : algorithmInstance, value);
 				// field.set(Modifier.isStatic(field.getModifiers()) ? null : algorithmInstance, value);
 				
 				return true;

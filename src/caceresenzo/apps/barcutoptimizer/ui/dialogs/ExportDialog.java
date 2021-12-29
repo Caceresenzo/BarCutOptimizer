@@ -25,14 +25,13 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import caceresenzo.apps.barcutoptimizer.config.Constants;
+import caceresenzo.apps.barcutoptimizer.config.I18n;
 import caceresenzo.apps.barcutoptimizer.logic.exporter.ExporterCallback;
 import caceresenzo.apps.barcutoptimizer.logic.exporter.implementations.PdfDataExporter;
 import caceresenzo.apps.barcutoptimizer.models.BarReference;
 import caceresenzo.apps.barcutoptimizer.ui.BarCutOptimizerWindow;
-import caceresenzo.libs.internationalization.i18n;
-import caceresenzo.libs.math.MathUtils;
-import caceresenzo.libs.thread.ThreadUtils;
 
+@SuppressWarnings("serial")
 public class ExportDialog extends JDialog implements Constants {
 	
 	/* Components */
@@ -60,7 +59,7 @@ public class ExportDialog extends JDialog implements Constants {
 		this.barReferences = barReferences;
 		
 		setSize(450, 300);
-		setTitle(i18n.string("export.frame.title"));
+		setTitle(I18n.string("export.frame.title"));
 		getContentPane().setLayout(new BorderLayout());
 		setLocationRelativeTo(null);
 		setModal(true);
@@ -68,10 +67,10 @@ public class ExportDialog extends JDialog implements Constants {
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		
 		JPanel filePanel = new JPanel();
-		filePanel.setBorder(new TitledBorder(null, i18n.string("export.panel.destination"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		filePanel.setBorder(new TitledBorder(null, I18n.string("export.panel.destination"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
 		JPanel progressPanel = new JPanel();
-		progressPanel.setBorder(new TitledBorder(null, i18n.string("export.panel.progress"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		progressPanel.setBorder(new TitledBorder(null, I18n.string("export.panel.progress"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		GroupLayout gl_contentPanel = new GroupLayout(contentPanel);
 		gl_contentPanel.setHorizontalGroup(
 				gl_contentPanel.createParallelGroup(Alignment.LEADING)
@@ -85,7 +84,7 @@ public class ExportDialog extends JDialog implements Constants {
 								.addComponent(progressPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addContainerGap(29, Short.MAX_VALUE)));
 		
-		etaLabel = new JLabel(i18n.string("export.eta.not-even-started"));
+		etaLabel = new JLabel(I18n.string("export.eta.not-even-started"));
 		etaLabel.setFont(etaLabel.getFont().deriveFont(etaLabel.getFont().getSize() + 8f));
 		etaLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		
@@ -117,7 +116,7 @@ public class ExportDialog extends JDialog implements Constants {
 		filePathTextField.setEditable(false);
 		filePathTextField.setColumns(10);
 		
-		selectFileButton = new JButton(i18n.string("export.button.select-file"));
+		selectFileButton = new JButton(I18n.string("export.button.select-file"));
 		GroupLayout gl_filePanel = new GroupLayout(filePanel);
 		gl_filePanel.setHorizontalGroup(
 				gl_filePanel.createParallelGroup(Alignment.LEADING)
@@ -143,11 +142,11 @@ public class ExportDialog extends JDialog implements Constants {
 		buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		getContentPane().add(buttonPane, BorderLayout.SOUTH);
 		
-		exportButton = new JButton(i18n.string("export.button.export"));
+		exportButton = new JButton(I18n.string("export.button.export"));
 		exportButton.setEnabled(false);
 		buttonPane.add(exportButton);
 		getRootPane().setDefaultButton(exportButton);
-		closeButton = new JButton(i18n.string("export.button.close"));
+		closeButton = new JButton(I18n.string("export.button.close"));
 		buttonPane.add(closeButton);
 		
 		initializeButtons();
@@ -161,7 +160,7 @@ public class ExportDialog extends JDialog implements Constants {
 	}
 	
 	private void openFileSelector() {
-		FileDialog fileDialog = new FileDialog(BarCutOptimizerWindow.get().getWindow(), i18n.string("import.dialog.title"), FileDialog.SAVE);
+		FileDialog fileDialog = new FileDialog(BarCutOptimizerWindow.get().getWindow(), I18n.string("import.dialog.title"), FileDialog.SAVE);
 		fileDialog.setLocationRelativeTo(null);
 		fileDialog.setFile("*." + PDF_EXTENSION);
 		fileDialog.setVisible(true);
@@ -200,7 +199,7 @@ public class ExportDialog extends JDialog implements Constants {
 						@Override
 						public void onNextEta(String eta) {
 							etaProgressBar.setValue(etaProgressBar.getValue() + 1);
-							etaLabel.setText(i18n.string("export.pdf.eta." + eta));
+							etaLabel.setText(I18n.string("export.pdf.eta." + eta));
 						}
 						
 						@Override
@@ -208,7 +207,7 @@ public class ExportDialog extends JDialog implements Constants {
 							// progressProgressBar.setMaximum(max);
 							// progressProgressBar.setValue(current);
 							
-							progressProgressBar.setValue((int) MathUtils.pourcent(current, max));
+							progressProgressBar.setValue((int) ((current * 100.0f) / max));
 							progressProgressBar.setString(current + " / " + max);
 							
 							// ThreadUtils.sleep(10);
@@ -216,12 +215,12 @@ public class ExportDialog extends JDialog implements Constants {
 						
 						@Override
 						public void onFinished(File file) {
-							JOptionPane.showMessageDialog(ExportDialog.this, i18n.string("export.eta.done", file.getAbsolutePath()), i18n.string("export.eta.done.dialog-title"), JOptionPane.INFORMATION_MESSAGE);
+							JOptionPane.showMessageDialog(ExportDialog.this, I18n.string("export.eta.done", file.getAbsolutePath()), I18n.string("export.eta.done.dialog-title"), JOptionPane.INFORMATION_MESSAGE);
 						}
 					}).exportToFile(barReferences, targetFile);
 				} catch (Exception exception) {
 					exception.printStackTrace();
-					JOptionPane.showMessageDialog(ExportDialog.this, i18n.string("export.error.generic"), i18n.string("dialog.error.title"), JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(ExportDialog.this, I18n.string("export.error.generic"), I18n.string("dialog.error.title"), JOptionPane.INFORMATION_MESSAGE);
 				}
 				
 				SwingUtilities.invokeLater(() -> close());

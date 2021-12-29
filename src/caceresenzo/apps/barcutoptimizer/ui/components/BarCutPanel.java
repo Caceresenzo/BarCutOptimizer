@@ -7,12 +7,12 @@ import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 import javax.swing.JPanel;
+import javax.swing.border.TitledBorder;
 
 import caceresenzo.apps.barcutoptimizer.models.Cut;
 import caceresenzo.apps.barcutoptimizer.models.CutGroup;
-import caceresenzo.libs.list.ListUtils;
-import javax.swing.border.TitledBorder;
 
+@SuppressWarnings("serial")
 public class BarCutPanel extends JPanel {
 	
 	private final CutGroup cutGroup;
@@ -46,7 +46,8 @@ public class BarCutPanel extends JPanel {
 		graphics2d.fillRect(startX, startY, maxWidth - startX, maxHeight - startY);
 		
 		List<Cut> cuts = cutGroup.getCuts();
-		Cut lastCutElement = ListUtils.getLastestItem(cuts);
+		Cut lastCutElement = cuts.get(cuts.size() - 1);
+		
 		int eatedLength = 0;
 		for (int index = 0; index < cuts.size(); index++) {
 			Cut cut = cuts.get(index);

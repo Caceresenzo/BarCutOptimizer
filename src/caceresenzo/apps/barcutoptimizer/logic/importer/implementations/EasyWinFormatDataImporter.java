@@ -13,7 +13,6 @@ import caceresenzo.apps.barcutoptimizer.logic.importer.DataImporter;
 import caceresenzo.apps.barcutoptimizer.models.BarReference;
 import caceresenzo.apps.barcutoptimizer.models.Cut;
 import caceresenzo.apps.barcutoptimizer.models.CutGroup;
-import caceresenzo.libs.list.ListUtils;
 
 public class EasyWinFormatDataImporter implements DataImporter {
 	
@@ -21,7 +20,7 @@ public class EasyWinFormatDataImporter implements DataImporter {
 	public static final String NEW_REFERENCE_SEPERATOR = "BARRE N°/REP LONG. COUP1 COUP2 P CASE CHUTE";
 	public static final String PAGE_SEPARATOR_PREFIX = "DEBITS PROFILS ";
 	public static final String[] BAR_REFERENCE_WORD_BLACKLIST = { "FICTIF", "FICTIVE" };
-
+	
 	public static final int INVALID_INDEX = -1;
 	
 	@Override
@@ -81,7 +80,7 @@ public class EasyWinFormatDataImporter implements DataImporter {
 					currentCutGroup = new CutGroup(Integer.parseInt(line.split(" ")[1]), CutGroup.UNKNOWN_REMAINING, new ArrayList<>());
 				} else {
 					if (index == 0) {
-						currentCutGroup = ListUtils.getLastestItem(cutGroups);
+						currentCutGroup = cutGroups.isEmpty() ? null : cutGroups.get(cutGroups.size() - 1);
 					}
 				}
 				
