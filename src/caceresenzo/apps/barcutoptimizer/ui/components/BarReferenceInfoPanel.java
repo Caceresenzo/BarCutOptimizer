@@ -14,15 +14,16 @@ import javax.swing.border.TitledBorder;
 import caceresenzo.apps.barcutoptimizer.config.I18n;
 import caceresenzo.apps.barcutoptimizer.models.BarReference;
 
+@SuppressWarnings("serial")
 public class BarReferenceInfoPanel extends JPanel {
 	
 	/* Components */
 	private JTextField consumedBarTextField;
 	private JLabel consumedBarLabel;
+	private JTextField totalCutsTextField;
 	
 	/* Variables */
 	private final BarReference barReference;
-	private JTextField totalCutsTextField;
 	
 	/**
 	 * Create the panel.
@@ -49,31 +50,29 @@ public class BarReferenceInfoPanel extends JPanel {
 		JLabel totalCutsLabel = new JLabel(I18n.string("editor.list.item.bar-reference-information.item.total-cuts-count"));
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.TRAILING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
-						.addComponent(totalCutsLabel, Alignment.TRAILING, 0, 0, Short.MAX_VALUE)
-						.addComponent(consumedBarLabel, Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 197, Short.MAX_VALUE))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(totalCutsTextField, GroupLayout.DEFAULT_SIZE, 67, Short.MAX_VALUE)
-						.addComponent(consumedBarTextField, GroupLayout.DEFAULT_SIZE, 67, Short.MAX_VALUE))
-					.addContainerGap())
-		);
+				groupLayout.createParallelGroup(Alignment.TRAILING)
+						.addGroup(groupLayout.createSequentialGroup()
+								.addContainerGap()
+								.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
+										.addComponent(totalCutsLabel, Alignment.TRAILING, 0, 0, Short.MAX_VALUE)
+										.addComponent(consumedBarLabel, Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 197, Short.MAX_VALUE))
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+										.addComponent(totalCutsTextField, GroupLayout.DEFAULT_SIZE, 67, Short.MAX_VALUE)
+										.addComponent(consumedBarTextField, GroupLayout.DEFAULT_SIZE, 67, Short.MAX_VALUE))
+								.addContainerGap()));
 		groupLayout.setVerticalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-						.addComponent(consumedBarLabel, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)
-						.addComponent(consumedBarTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-						.addComponent(totalCutsLabel, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)
-						.addComponent(totalCutsTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(20, Short.MAX_VALUE))
-		);
+				groupLayout.createParallelGroup(Alignment.LEADING)
+						.addGroup(groupLayout.createSequentialGroup()
+								.addContainerGap()
+								.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+										.addComponent(consumedBarLabel, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)
+										.addComponent(consumedBarTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+										.addComponent(totalCutsLabel, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)
+										.addComponent(totalCutsTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+								.addContainerGap(20, Short.MAX_VALUE)));
 		setLayout(groupLayout);
 		
 		showInformations();

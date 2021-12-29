@@ -44,13 +44,15 @@ import caceresenzo.apps.barcutoptimizer.ui.components.CutGroupPanel;
 import caceresenzo.apps.barcutoptimizer.ui.dialogs.CutsEditionDialog;
 import caceresenzo.apps.barcutoptimizer.ui.dialogs.ExportDialog;
 import caceresenzo.apps.barcutoptimizer.ui.others.NewBarReferenceDialogs;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@SuppressWarnings("serial")
 public class EditorWindow implements Constants {
 	
 	/* Components */
-	private JFrame frame;
+	private @Getter JFrame frame;
 	private BarReference currentBarReference;
 	private JPanel cutGroupListContainerPanel;
 	private JScrollPane cutGroupListScrollPanel;
@@ -435,10 +437,6 @@ public class EditorWindow implements Constants {
 		popup.show(tree, x, y);
 	}
 	
-	public JFrame getFrame() {
-		return frame;
-	}
-	
 	public static final EditorWindow open(List<BarReference> barReferences) {
 		EditorWindow window = new EditorWindow(barReferences);
 		window.frame.setVisible(true);
@@ -446,7 +444,4 @@ public class EditorWindow implements Constants {
 		return window;
 	}
 	
-	public JButton getButton() {
-		return exportButton;
-	}
 }

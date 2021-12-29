@@ -13,6 +13,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
+@SuppressWarnings("serial")
 public class ProgressDialog extends JDialog {
 	
 	/* Components */

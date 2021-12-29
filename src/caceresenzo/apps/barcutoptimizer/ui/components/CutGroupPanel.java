@@ -13,14 +13,13 @@ import javax.swing.border.TitledBorder;
 import caceresenzo.apps.barcutoptimizer.config.I18n;
 import caceresenzo.apps.barcutoptimizer.models.CutGroup;
 
+@SuppressWarnings("serial")
 public class CutGroupPanel extends JPanel {
 	
 	/* Variables */
 	private final CutGroup cutGroup;
 	
-	/**
-	 * Create the panel.
-	 */
+	/** Create the panel. */
 	public CutGroupPanel(CutGroup cutGroup) {
 		this.cutGroup = cutGroup;
 		
@@ -78,4 +77,5 @@ public class CutGroupPanel extends JPanel {
 	public CutGroup getCutGroup() {
 		return cutGroup;
 	}
+	
 }

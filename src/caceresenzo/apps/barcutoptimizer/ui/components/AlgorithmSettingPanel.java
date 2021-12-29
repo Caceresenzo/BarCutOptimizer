@@ -17,6 +17,7 @@ import javax.swing.event.DocumentListener;
 import caceresenzo.apps.barcutoptimizer.logic.algorithms.AlgorithmManager;
 import caceresenzo.apps.barcutoptimizer.logic.algorithms.AlgorithmManager.AlgorithmSettingEntry;
 
+@SuppressWarnings("serial")
 public class AlgorithmSettingPanel extends JPanel {
 	
 	/* Components */

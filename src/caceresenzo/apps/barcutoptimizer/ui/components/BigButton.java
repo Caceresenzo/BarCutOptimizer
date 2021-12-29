@@ -15,11 +15,10 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 
+@SuppressWarnings("serial")
 public class BigButton extends JPanel {
 	
-	/**
-	 * Create the panel.
-	 */
+	/** Create the panel. */
 	public BigButton(String title, String iconClasspathUrl, OnBigButtonClickListener bigButtonClickListener) {
 		setBorder(new LineBorder(new Color(0, 0, 0)));
 		setSize(200, 240);
@@ -81,11 +80,7 @@ public class BigButton extends JPanel {
 		});
 	}
 	
-	/**
-	 * Simple listener class used when a {@link MouseEvent mouse clicked event} is detected on a {@link BigButton}.
-	 * 
-	 * @author Enzo CACERES
-	 */
+	/** Simple listener class used when a {@link MouseEvent mouse clicked event} is detected on a {@link BigButton}. */
 	public static interface OnBigButtonClickListener {
 		
 		public void onClick(BigButton bigButton);
