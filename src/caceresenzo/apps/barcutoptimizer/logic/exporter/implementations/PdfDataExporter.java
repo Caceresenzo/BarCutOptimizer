@@ -33,6 +33,7 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 import caceresenzo.apps.barcutoptimizer.BarCutOptimizer;
 import caceresenzo.apps.barcutoptimizer.assets.Assets;
+import caceresenzo.apps.barcutoptimizer.config.Constants;
 import caceresenzo.apps.barcutoptimizer.config.I18n;
 import caceresenzo.apps.barcutoptimizer.logic.algorithms.impl.FillingCutAlgorithm;
 import caceresenzo.apps.barcutoptimizer.logic.exporter.DataExporter;
@@ -785,7 +786,7 @@ public class PdfDataExporter implements DataExporter {
 		float baseY = PAGE_MARGIN_VERTICAL / 2f;
 		float fontSize = (float) (FONT_SIZE * 0.6);
 		
-		String[] lines = I18n.string("application.copyright.full").split("\n");
+		String[] lines = I18n.string("application.copyright.full", Constants.VERSION).split("\n");
 		for (int index = 0; index < lines.length; index++) {
 			String line = lines[index];
 			
