@@ -188,7 +188,7 @@ public class PdfDataExporter implements DataExporter {
 									I18n.string("exporter.column.bar.item.size", cutGroup.getCutCount(), cutGroup.getCutCount() > 1 ? I18n.string("multiple-element-letter") : "")));
 							
 							int usedY2 = 0; /* Set 3 times just for the look ;) */
-							usedY2 = printTextColumn(contentStream, startX + SPACE_BETWEEN_COLUMN, inversedY, I18n.string("exporter.column.length"), cutListToLines(cuts, (cut) -> StringUtils.leftPad(String.valueOf(cut.getLength()), 8)));
+							usedY2 = printTextColumn(contentStream, startX + SPACE_BETWEEN_COLUMN * 1, inversedY, I18n.string("exporter.column.length"), cutListToLines(cuts, (cut) -> StringUtils.leftPad(String.valueOf(cut.getLength()), 8)));
 							usedY2 = printTextColumn(contentStream, startX + SPACE_BETWEEN_COLUMN * 2, inversedY, I18n.string("exporter.column.angle.a"), cutListToLines(cuts, (cut) -> StringUtils.leftPad(cut.getCutAngleA() + "°", 7)));
 							usedY2 = printTextColumn(contentStream, startX + SPACE_BETWEEN_COLUMN * 3, inversedY, I18n.string("exporter.column.angle.b"), cutListToLines(cuts, (cut) -> StringUtils.leftPad(cut.getCutAngleB() + "°", 7)));
 							
@@ -488,16 +488,13 @@ public class PdfDataExporter implements DataExporter {
 						float width = computeStringWidth(length);
 						
 						String text = column.getAlign().apply(value, length);
-						if (column.getAlign() == Align.RIGHT) {
-							System.out.println(String.format("`%s`", text));
-						}
 						
 						printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL + offsetY, inversedY, FONT_SIZE, text);
 						offsetY += width + FONT_SIZE;
-						
-						if (ADD_LINE_BETWEEN_CELL_IN_COUNT_TABLE && index != valueCount - 1) {
-							printSimpleHorizontalLine(contentStream, PAGE_MARGIN_HORIZONTAL, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, (float) (inversedY - FONT_SIZE * 0.4f), 0.1f);
-						}
+					}
+					
+					if (ADD_LINE_BETWEEN_CELL_IN_COUNT_TABLE && iterator.hasNext()) {
+						printSimpleHorizontalLine(contentStream, PAGE_MARGIN_HORIZONTAL, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, (float) (inversedY - FONT_SIZE * 0.4f), 0.1f);
 					}
 					
 					currentY += cellHeight;
