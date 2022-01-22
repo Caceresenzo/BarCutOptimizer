@@ -17,7 +17,7 @@ import caceresenzo.apps.barcutoptimizer.models.CutGroup;
 public class EasyWinFormatDataImporter implements DataImporter {
 	
 	public static final String NEW_BAR_REGEX = "[\\d]+x [\\d]+ .*";
-	public static final String NEW_REFERENCE_SEPERATOR = "BARRE NÂ°/REP LONG. COUP1 COUP2 P CASE CHUTE";
+	public static final String NEW_REFERENCE_SEPERATOR = "BARRE N°/REP LONG. COUP1 COUP2 P CASE CHUTE";
 	public static final String PAGE_SEPARATOR_PREFIX = "DEBITS PROFILS ";
 	public static final String[] BAR_REFERENCE_WORD_BLACKLIST = { "FICTIF", "FICTIVE" };
 	
