@@ -46,6 +46,10 @@ public class BarReference {
 		return allCuts;
 	}
 	
+	public int countAllCuts() {
+		return getCutGroups().stream().map(CutGroup::getCuts).mapToInt(List::size).sum();
+	}
+	
 	public Map<Cut, Integer> computeCutCountMap() {
 		Map<Cut, Integer> map = new LinkedHashMap<>();
 		List<Cut> allCuts = getAllCuts();
