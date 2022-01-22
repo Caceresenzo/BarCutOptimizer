@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Supplier;
 
 import caceresenzo.apps.barcutoptimizer.logic.algorithms.CutAlgorithm;
 
@@ -66,8 +67,8 @@ public class BarReference {
 		return map;
 	}
 	
-	public Map<Double, Integer> computeRemainingCountMap() {
-		Map<Double, Integer> map = new LinkedHashMap<>();
+	public Map<Double, Integer> computeRemainingCountMap(Supplier<Map<Double, Integer>> mapFactory) {
+		Map<Double, Integer> map = mapFactory.get();
 		
 		for (CutGroup cutGroup : getCutGroups()) {
 			map.compute(cutGroup.getRemainingBarLength(), (key, value) -> value == null ? 1 : value + 1);

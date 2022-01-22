@@ -6,13 +6,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 
 import javax.imageio.ImageIO;
@@ -41,6 +43,8 @@ import caceresenzo.apps.barcutoptimizer.models.CutGroup;
 import caceresenzo.apps.barcutoptimizer.models.CutTableInput;
 import caceresenzo.apps.barcutoptimizer.models.UnoptimizedCutList;
 import caceresenzo.apps.barcutoptimizer.ui.components.BarCutPanel;
+import lombok.Data;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -111,6 +115,21 @@ public class PdfDataExporter implements DataExporter {
 		int etaCurrentProgress = 0;
 		
 		int globalPageCounter = 0;
+		
+		{ /* references */
+			Table table = new Table()
+					.setTitle(I18n.string("exporter.word.references-count"))
+					.setExtra(String.format("%s reference(s)", barReferences.size()))
+					.addColumn(I18n.string("exporter.word.name"))
+					.addColumn(I18n.string("exporter.word.quantity"));
+			
+			for (BarReference barReference : barReferences) {
+				table.addRow(barReference.getName(), barReference.getAllCuts().size());
+			}
+			
+			globalPageCounter = printTable(table, globalPageCounter);
+		}
+		
 		for (BarReference barReference : barReferences) {
 			File barReferenceBaseFolder = new File(exportTemporaryFolder, FileSystem.getCurrent().toLegalFileName(barReference.getName(), '_'));
 			
@@ -227,145 +246,47 @@ public class PdfDataExporter implements DataExporter {
 				localPageCounter++;
 			}
 			
-			Map<Cut, Integer> countMap = barReference.computeCutCountMap();
-			ListIterator<Cut> cutIterator = new ArrayList<Cut>(countMap.keySet()).listIterator();
-			int alreadyCounted = 0;
-			
-			while (cutIterator.hasNext()) {
-				PDPage page = createPage();
-				PDRectangle mediaBox = page.getMediaBox();
-				final int maxY = (int) (mediaBox.getHeight() - PAGE_MARGIN_VERTICAL);
-				int currentY = PAGE_MARGIN_VERTICAL;
+			{ /* counts */
+				int totalCutCount = barReference.getAllCuts().size();
+				int totalCutGroupCount = barReference.getCutGroups().size();
+				String multipleElementLetter = I18n.string("multiple-element-letter");
 				
-				int evenLocalIndex = 0;
-				while (currentY < maxY) {
-					Cut cut = cutIterator.next();
-					int count = countMap.get(cut);
+				String consumptionText = I18n.string("exporter.message.consumption", totalCutCount, totalCutCount > 1 ? multipleElementLetter : "", totalCutGroupCount, totalCutGroupCount > 1 ? multipleElementLetter : "");
+				
+				Table table = new Table()
+						.setTitle(I18n.string("exporter.word.bar-reference.format", barReference.getName()))
+						.setExtra(consumptionText)
+						.addColumn(I18n.string("exporter.word.quantity"))
+						.addColumn(I18n.string("exporter.word.cut"), Align.RIGHT)
+						.addColumn(I18n.string("exporter.word.angle"));
+				
+				for (Map.Entry<Cut, Integer> entry : barReference.computeCutCountMap().entrySet()) {
+					Cut cut = entry.getKey();
+					int count = entry.getValue();
 					
-					alreadyCounted++;
+					String angle = String.format("%2s° / %2s°", cut.getCutAngleA(), cut.getCutAngleB());
 					
-					try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, false)) {
-						float cellHeight = (float) (FONT_SIZE * 1.5);
-						
-						if (evenLocalIndex == 0) {
-							printHeader(contentStream, mediaBox, barReference);
-							printFooter(contentStream, mediaBox);
-							
-							printPageFooter(contentStream, mediaBox, globalPageCounter, localPageCounter);
-							
-							currentY += FONT_SIZE * 2;
-							
-							float textY = mediaBox.getHeight() - PAGE_MARGIN_VERTICAL - (FONT_SIZE * 3f);
-							
-							printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL, textY, FONT_SIZE, I18n.string("exporter.word.quantity").toUpperCase());
-							printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL + SMALL_SPACE_BETWEEN_COLUMN + FONT_SIZE / 2f, textY, FONT_SIZE, I18n.string("exporter.word.cut"));
-							
-							printSimpleHorizontalLine(contentStream, PAGE_MARGIN_HORIZONTAL, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, textY - (FONT_SIZE / 2f));
-							
-							int maxLineY = (int) Math.max((textY - FONT_SIZE / 2f - cellHeight * (countMap.size() - alreadyCounted + 1)), PAGE_MARGIN_HORIZONTAL);
-							
-							printSimpleVerticalLine(contentStream, PAGE_MARGIN_HORIZONTAL + SMALL_SPACE_BETWEEN_COLUMN, (float) (textY + FONT_SIZE), maxLineY);
-							
-							currentY += FONT_SIZE * 2.5;
-							
-							/* Printing bar consumption */
-							int totalCutCount = barReference.getAllCuts().size();
-							int totalCutGroupCount = barReference.getCutGroups().size();
-							String multipleElementLetter = I18n.string("multiple-element-letter");
-							
-							String consumptionText = I18n.string("exporter.message.consumption", totalCutCount, totalCutCount > 1 ? multipleElementLetter : "", totalCutGroupCount, totalCutGroupCount > 1 ? multipleElementLetter : "");
-							printSimpleText(contentStream, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL - computeStringWidth(consumptionText), textY, FONT_SIZE, consumptionText.toUpperCase());
-						}
-						
-						float inversedY = mediaBox.getHeight() - currentY;
-						
-						printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL, inversedY, FONT_SIZE, StringUtils.leftPad(String.format("%sx", count), 8));
-						printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL + SMALL_SPACE_BETWEEN_COLUMN + FONT_SIZE / 2f, inversedY, FONT_SIZE, String.format("%-7s    %2s° / %2s°", StringUtils.leftPad(String.valueOf(cut.getLength()), 7), cut.getCutAngleA(), cut.getCutAngleB()));
-						
-						if (ADD_LINE_BETWEEN_CELL_IN_COUNT_TABLE && cutIterator.hasNext()) {
-							printSimpleHorizontalLine(contentStream, PAGE_MARGIN_HORIZONTAL, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, (float) (inversedY - FONT_SIZE * 0.4f), 0.1f);
-						}
-						
-						currentY += cellHeight;
-					}
-					
-					if (!cutIterator.hasNext()) {
-						break;
-					}
-					
-					evenLocalIndex++;
+					table.addRow(String.format("%sx", count), cut.getLength(), angle);
 				}
 				
-				globalPageCounter++;
-				localPageCounter++;
+				globalPageCounter = printTable(table, globalPageCounter);
 			}
 			
-			Map<Double, Integer> remainingCountMap = barReference.computeRemainingCountMap();
-			List<Double> remainingLengths = new ArrayList<>(remainingCountMap.keySet());
-			Collections.sort(remainingLengths);
-			Collections.reverse(remainingLengths);
-			ListIterator<Double> remainingIterator = remainingLengths.listIterator();
-			alreadyCounted = 0;
-			
-			while (remainingIterator.hasNext()) {
-				PDPage page = createPage();
-				PDRectangle mediaBox = page.getMediaBox();
-				final int maxY = (int) (mediaBox.getHeight() - PAGE_MARGIN_VERTICAL);
-				int currentY = PAGE_MARGIN_VERTICAL;
+			{ /* leftovers */
+				Table table = new Table()
+						.setTitle(I18n.string("exporter.word.bar-reference.format", barReference.getName()))
+						.addColumn(I18n.string("exporter.word.quantity"))
+						.addColumn(I18n.string("exporter.word.leftover"), Align.RIGHT);
 				
-				int evenLocalIndex = 0;
-				while (currentY < maxY) {
-					double remainingLength = remainingIterator.next();
-					int count = remainingCountMap.get(remainingLength);
+				Map<Double, Integer> remainingCountMap = barReference.computeRemainingCountMap(() -> new TreeMap<>(Comparator.reverseOrder()));
+				for (Map.Entry<Double, Integer> entry : remainingCountMap.entrySet()) {
+					double remainingLength = entry.getKey();
+					int count = entry.getValue();
 					
-					alreadyCounted++;
-					
-					try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, false)) {
-						float cellHeight = (float) (FONT_SIZE * 1.5);
-						
-						if (evenLocalIndex == 0) {
-							printHeader(contentStream, mediaBox, barReference);
-							printFooter(contentStream, mediaBox);
-							
-							printPageFooter(contentStream, mediaBox, globalPageCounter, localPageCounter);
-							
-							currentY += FONT_SIZE * 2;
-							
-							float textY = mediaBox.getHeight() - PAGE_MARGIN_VERTICAL - (FONT_SIZE * 3f);
-							
-							printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL, textY, FONT_SIZE, I18n.string("exporter.word.quantity").toUpperCase());
-							printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL + SMALL_SPACE_BETWEEN_COLUMN + FONT_SIZE / 2f, textY, FONT_SIZE, I18n.string("exporter.word.leftover"));
-							
-							printSimpleHorizontalLine(contentStream, PAGE_MARGIN_HORIZONTAL, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, textY - (FONT_SIZE / 2f));
-							
-							int maxLineY = (int) Math.max((textY - FONT_SIZE / 2f - cellHeight * (remainingCountMap.size() - alreadyCounted + 1)), PAGE_MARGIN_HORIZONTAL);
-							
-							printSimpleVerticalLine(contentStream, PAGE_MARGIN_HORIZONTAL + SMALL_SPACE_BETWEEN_COLUMN, (float) (textY + FONT_SIZE), maxLineY);
-							
-							currentY += FONT_SIZE * 2.5;
-						}
-						
-						float inversedY = mediaBox.getHeight() - currentY;
-						
-						printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL, inversedY, FONT_SIZE, StringUtils.leftPad(String.format("%sx", count), 8));
-						printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL + SMALL_SPACE_BETWEEN_COLUMN + FONT_SIZE / 2f, inversedY, FONT_SIZE, String.format("%-7s", StringUtils.leftPad(String.valueOf(remainingLength), 7)));
-						
-						if (ADD_LINE_BETWEEN_CELL_IN_COUNT_TABLE && remainingIterator.hasNext()) {
-							printSimpleHorizontalLine(contentStream, PAGE_MARGIN_HORIZONTAL, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, (float) (inversedY - FONT_SIZE * 0.4f), 0.1f);
-						}
-						
-						currentY += cellHeight;
-					}
-					
-					if (!remainingIterator.hasNext()) {
-						break;
-					}
-					
-					evenLocalIndex++;
+					table.addRow(String.format("%sx", count), remainingLength);
 				}
 				
-				globalPageCounter++;
-				localPageCounter++;
+				globalPageCounter = printTable(table, globalPageCounter);
 			}
 			
 			publishProgress(etaCurrentMax, ++etaCurrentProgress);
@@ -488,6 +409,111 @@ public class PdfDataExporter implements DataExporter {
 		ImageIO.write(renderCutGroup(cutGroup), "png", file);
 		
 		temporaryFiles.add(file);
+	}
+	
+	private int printTable(Table table, int globalPageCounter) throws IOException {
+		int localPageCounter = 0;
+		
+		List<Column> columns = table.getColumns();
+		List<Integer> columnsLength = table.getColumnsLength();
+		ListIterator<List<String>> iterator = table.getRows().listIterator();
+		
+		int alreadyCounted = 0;
+		
+		while (iterator.hasNext()) {
+			PDPage page = createPage();
+			PDRectangle mediaBox = page.getMediaBox();
+			final int maxY = (int) (mediaBox.getHeight() - PAGE_MARGIN_VERTICAL);
+			int currentY = PAGE_MARGIN_VERTICAL;
+			
+			int evenLocalIndex = 0;
+			while (currentY < maxY) {
+				List<String> row = iterator.next();
+				
+				alreadyCounted++;
+				
+				try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, false)) {
+					float cellHeight = (float) (FONT_SIZE * 1.5);
+					
+					if (evenLocalIndex == 0) {
+						float textY = mediaBox.getHeight() - PAGE_MARGIN_VERTICAL - (FONT_SIZE * 3f);
+						
+						printHeader(contentStream, mediaBox, table.getTitle());
+						
+						String extra = table.getExtra();
+						if (StringUtils.isNotBlank(extra)) {
+							printSimpleText(contentStream, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL - computeStringWidth(extra), textY, FONT_SIZE, extra);
+						}
+						
+						printFooter(contentStream, mediaBox);
+						
+						printPageFooter(contentStream, mediaBox, globalPageCounter, localPageCounter);
+						
+						currentY += FONT_SIZE * 2;
+						
+						float offsetY = 0;
+						
+						int columnCount = columns.size();
+						for (int index = 0; index < columnCount; index++) {
+							Column column = columns.get(index);
+							int length = columnsLength.get(index);
+							
+							float width = computeStringWidth(length);
+							
+							printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL + offsetY, textY, FONT_SIZE, column.getName());
+							offsetY += width + FONT_SIZE / 2f;
+							
+							if (index != columnCount - 1) {
+								int maxLineY = (int) Math.max((textY - FONT_SIZE / 2f - cellHeight * (table.getRows().size() - alreadyCounted + 1)), PAGE_MARGIN_HORIZONTAL);
+								printSimpleVerticalLine(contentStream, PAGE_MARGIN_HORIZONTAL + offsetY, (float) (textY + FONT_SIZE), maxLineY);
+							}
+							
+							offsetY += FONT_SIZE / 2f;
+						}
+						
+						printSimpleHorizontalLine(contentStream, PAGE_MARGIN_HORIZONTAL, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, textY - (FONT_SIZE * 0.4f));
+						
+						currentY += FONT_SIZE * 2.5;
+					}
+					
+					float inversedY = mediaBox.getHeight() - currentY;
+					
+					float offsetY = 0;
+					int valueCount = row.size();
+					for (int index = 0; index < valueCount; index++) {
+						Column column = columns.get(index);
+						String value = row.get(index);
+						int length = columnsLength.get(index);
+						
+						float width = computeStringWidth(length);
+						
+						String text = column.getAlign().apply(value, length);
+						if (column.getAlign() == Align.RIGHT) {
+							System.out.println(String.format("`%s`", text));
+						}
+						
+						printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL + offsetY, inversedY, FONT_SIZE, text);
+						offsetY += width + FONT_SIZE;
+						
+						if (ADD_LINE_BETWEEN_CELL_IN_COUNT_TABLE && index != valueCount - 1) {
+							printSimpleHorizontalLine(contentStream, PAGE_MARGIN_HORIZONTAL, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, (float) (inversedY - FONT_SIZE * 0.4f), 0.1f);
+						}
+					}
+					
+					currentY += cellHeight;
+				}
+				
+				if (!iterator.hasNext()) {
+					break;
+				}
+				
+				evenLocalIndex++;
+			}
+			
+			globalPageCounter++;
+			localPageCounter++;
+		}
+		return globalPageCounter;
 	}
 	
 	/**
@@ -625,8 +651,16 @@ public class PdfDataExporter implements DataExporter {
 		return computeStringWidth(string, FONT_SIZE);
 	}
 	
+	private float computeStringWidth(int length) {
+		return computeStringWidth(length, FONT_SIZE);
+	}
+	
 	private float computeStringWidth(String string, int fontSize) {
-		return string.length() * (font.getAverageFontWidth() / 1000) * fontSize;
+		return computeStringWidth(string.length(), fontSize);
+	}
+	
+	private float computeStringWidth(int length, int fontSize) {
+		return length * (font.getAverageFontWidth() / 1000) * fontSize;
 	}
 	
 	/**
@@ -732,7 +766,11 @@ public class PdfDataExporter implements DataExporter {
 	 *             If there is an error writing to the stream.
 	 */
 	private void printHeader(PDPageContentStream contentStream, PDRectangle mediaBox, BarReference barReference) throws IOException {
-		printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL, mediaBox.getHeight() - PAGE_MARGIN_VERTICAL - FONT_SIZE, (float) (FONT_SIZE * 1.5), I18n.string("exporter.word.bar-reference.format", barReference.getName()));
+		printHeader(contentStream, mediaBox, I18n.string("exporter.word.bar-reference.format", barReference.getName()));
+	}
+	
+	private void printHeader(PDPageContentStream contentStream, PDRectangle mediaBox, String title) throws IOException {
+		printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL, mediaBox.getHeight() - PAGE_MARGIN_VERTICAL - FONT_SIZE, (float) (FONT_SIZE * 1.5), title);
 		printSimpleHorizontalLine(contentStream, PAGE_MARGIN_HORIZONTAL, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, (float) (mediaBox.getHeight() - PAGE_MARGIN_VERTICAL - (FONT_SIZE * 1.4)));
 	}
 	
@@ -838,20 +876,25 @@ public class PdfDataExporter implements DataExporter {
 	private void notifyInitialization() {
 		if (callback != null) {
 			callback.onInitialization(ETA_COUNT);
-			notifyNextEta(ETA_INITIALIZING);
 		}
+		
+		notifyNextEta(ETA_INITIALIZING);
 	}
 	
 	private void notifyNextEta(String eta) {
 		if (callback != null) {
 			callback.onNextEta(eta);
 		}
+		
+		log.trace("ETA: {}", eta);
 	}
 	
 	private void publishProgress(int current, int max) {
 		if (callback != null) {
 			callback.onProgressPublished(current, max);
 		}
+		
+		log.trace("Progress: {}/{}", current, max);
 	}
 	
 	private void notifyFinish(File file) {
@@ -878,6 +921,8 @@ public class PdfDataExporter implements DataExporter {
 	}
 	
 	public static void main(String[] args) throws Exception {
+		log.info("Test");
+		
 		I18n.load(Locale.FRENCH);
 		File file = new File("null.pdf");
 		
@@ -900,17 +945,17 @@ public class PdfDataExporter implements DataExporter {
 	static List<CutTableInput> getRandomCuts() {
 		List<CutTableInput> cutTableInputs = new ArrayList<>();
 		
-		// Random random = new Random();
-		//
-		// for (int i = 0; i < 10; i++) {
-		// CutTableInput cutTableInput = new CutTableInput();
-		//
-		// cutTableInput.setLength(Randomizer.nextRangeInt(500, 2500));
-		// cutTableInput.setQuantity(Randomizer.nextRangeInt(1, 8));
-		// cutTableInput.setCutAngles(new int[] { random.nextBoolean() ? 90 : 45, random.nextBoolean() ? 90 : 45 });
-		//
-		// cutTableInputs.add(cutTableInput);
-		// }
+		Random random = new Random();
+		
+		for (int i = 0; i < 10; i++) {
+			CutTableInput cutTableInput = new CutTableInput();
+			
+			cutTableInput.setLength(ThreadLocalRandom.current().nextInt(500, 2500));
+			cutTableInput.setQuantity(ThreadLocalRandom.current().nextInt(1, 8));
+			cutTableInput.setCutAngles(new int[] { random.nextBoolean() ? 90 : 45, random.nextBoolean() ? 90 : 45 });
+			
+			cutTableInputs.add(cutTableInput);
+		}
 		
 		return cutTableInputs;
 	}
@@ -929,6 +974,90 @@ public class PdfDataExporter implements DataExporter {
 		cutTableInputs.add(cutTableInput);
 		
 		return cutTableInputs;
+	}
+	
+	private enum Align {
+		
+		LEFT {
+			@Override
+			public String apply(String text, int length) {
+				return text;
+			}
+		},
+		RIGHT {
+			@Override
+			public String apply(String text, int length) {
+				return StringUtils.leftPad(text, length);
+			}
+		};
+		
+		public abstract String apply(String text, int length);
+		
+	}
+	
+	@Data
+	@Accessors(chain = true)
+	private class Column {
+		
+		private String name;
+		private Align align;
+		
+	}
+	
+	@Data
+	@Accessors(chain = true)
+	private class Table {
+		
+		private String title;
+		private String extra;
+		private List<Column> columns;
+		private List<List<String>> rows;
+		
+		public Table() {
+			this.columns = new ArrayList<>();
+			this.rows = new ArrayList<>();
+		}
+		
+		public Table addColumn(String name) {
+			return addColumn(name, Align.LEFT);
+		}
+		
+		public Table addColumn(String name, Align align) {
+			this.columns.add(new Column().setName(name).setAlign(align));
+			
+			return this;
+		}
+		
+		public Table addRow(Object... values) {
+			List<String> row = new ArrayList<>(values.length);
+			
+			for (Object value : values) {
+				row.add(String.valueOf(value));
+			}
+			
+			this.rows.add(row);
+			
+			return this;
+		}
+		
+		public List<Integer> getColumnsLength() {
+			int size = columns.size();
+			
+			List<Integer> lengths = new ArrayList<>(size);
+			for (int index = 0; index < size; index++) {
+				int column = this.columns.get(index).getName().length();
+				
+				final int finalIndex = index;
+				int maxRow = this.rows.stream().map((row) -> row.get(finalIndex)).mapToInt(String::length).max().orElse(0);
+				
+				int max = Math.max(column, maxRow);
+				
+				lengths.add(Math.max(1, max));
+			}
+			
+			return lengths;
+		}
+		
 	}
 	
 }

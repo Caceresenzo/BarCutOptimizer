@@ -81,7 +81,7 @@ public class Cut implements Cloneable {
 	}
 	
 	@Override
-	protected Cut clone() {
+	public Cut clone() {
 		Cut cut = new Cut(getLength(), getCutAngles());
 		cut.atLineIndex = getAtLineIndex();
 		

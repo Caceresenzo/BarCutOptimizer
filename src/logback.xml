@@ -4,12 +4,12 @@
 	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
 		<layout class="ch.qos.logback.classic.PatternLayout">
 			<Pattern>
-				%d{dd-MM-yyyy HH:mm:ss.SSS} %-5level --- [%15thread] %-42logger{36} : %msg%n
+				%d{dd-MM-yyyy HH:mm:ss.SSS} %-5level --- [%16thread] %-42logger{36} : %msg%n
 			</Pattern>
 		</layout>
 	</appender>
 
-	<logger name="caceresenzo" level="debug" additivity="false">
+	<logger name="caceresenzo" level="trace" additivity="false">
 		<appender-ref ref="CONSOLE" />
 	</logger>
 
