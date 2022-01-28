@@ -258,8 +258,6 @@ public class CutsEditionDialog extends JDialog implements Constants {
 			public void actionPerformed(ActionEvent event) {
 				((CutTableInputTableModel) table.getModel()).addNewEmptyItem();
 				table.repaint();
-				
-				markUserHasChangedData();
 			}
 		});
 		
@@ -279,7 +277,7 @@ public class CutsEditionDialog extends JDialog implements Constants {
 					
 					barReference.optimize(unoptimizedCutList, (CutAlgorithm) algorithmComboBox.getSelectedItem());
 					
-					callback.onFinish(barReference, hasUserChangedData);
+					callback.onFinish(barReference);
 				} catch (Exception exception) {
 					exception.printStackTrace();
 					
@@ -374,10 +372,6 @@ public class CutsEditionDialog extends JDialog implements Constants {
 			return;
 		}
 		
-		if (!hasUserChangedData && barLength != value && barLength != INVALID_LENGTH) {
-			markUserHasChangedData();
-		}
-		
 		barLengthTextField.setForeground(Color.BLACK);
 		barLength = value;
 	}
@@ -396,13 +390,9 @@ public class CutsEditionDialog extends JDialog implements Constants {
 		return dialog;
 	}
 	
-	private void markUserHasChangedData() {
-		hasUserChangedData = true;
-	}
-	
 	public static interface Callback {
 		
-		void onFinish(BarReference barReference, boolean hasDoneOptimization);
+		void onFinish(BarReference barReference);
 		
 		void onCancel(BarReference barReference);
 		
@@ -532,8 +522,6 @@ public class CutsEditionDialog extends JDialog implements Constants {
 					break;
 				}
 			}
-			
-			markUserHasChangedData();
 		}
 		
 		public List<CutTableInput> getCutTableInputs() {

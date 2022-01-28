@@ -249,12 +249,8 @@ public class EditorWindow implements Constants {
 			public void actionPerformed(ActionEvent event) {
 				CutsEditionDialog.open(getFrame(), currentBarReference, new CutsEditionDialog.Callback() {
 					@Override
-					public void onFinish(BarReference barReference, boolean hasDoneOptimization) {
-						if (hasDoneOptimization) {
-							displayBarReference(barReference);
-						}
-						
-						log.debug("Received callback from the cut editor dialog. (hasDoneOptimization? {})", hasDoneOptimization);
+					public void onFinish(BarReference barReference) {
+						displayBarReference(barReference);
 					}
 					
 					@Override
