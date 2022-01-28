@@ -52,6 +52,7 @@ public class FillingCutAlgorithm implements CutAlgorithm {
 					barCuts.add(cut);
 					
 					remainingBarLength -= cut.getLength();
+					remainingBarLength -= cutOffset;
 				}
 			}
 			
