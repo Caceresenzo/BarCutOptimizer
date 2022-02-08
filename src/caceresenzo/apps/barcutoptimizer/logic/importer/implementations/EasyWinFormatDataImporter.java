@@ -4,6 +4,7 @@ import java.io.File;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -90,7 +91,7 @@ public class EasyWinFormatDataImporter implements DataImporter {
 					
 					break;
 				} else {
-					Cut cut = Cut.fromExtractedLine(line).atLine(currentIndex);
+					Cut cut = fromExtractedLine(line);
 					
 					currentCutGroup.getCuts().add(cut);
 				}
@@ -102,13 +103,39 @@ public class EasyWinFormatDataImporter implements DataImporter {
 		return barReferences;
 	}
 	
+	private static Cut fromExtractedLine(String line) {
+		String[] rawData = Objects.requireNonNull(line.split(" "), "Can't construct a Cut object with a null extracted line.");
+		
+		int firstDegreeCharOffset = 0;
+		for (int index = 0; index < rawData.length; index++) {
+			String part = rawData[index];
+			
+			if (part.toCharArray()[0] == '°') {
+				firstDegreeCharOffset = index;
+				break;
+			}
+		}
+		
+		int zero = firstDegreeCharOffset - 2;
+		
+		if (zero < 0) {
+			zero = 0;
+		}
+		
+		double length = Double.valueOf(rawData[zero]);
+		int angleA = (int) (double) Double.valueOf(rawData[zero + 1]);
+		int angleB = (int) (double) Double.valueOf(rawData[zero + 3]);
+		
+		return new Cut(length, new int[] { angleA, angleB });
+	}
+	
 	/**
 	 * Use the method {@link String#trim()} on all <code>lines</code>.
 	 * 
 	 * @param lines
 	 *            {@link Array} of {@link String}.
 	 */
-	private void autoTrim(String[] lines) {
+	private static void autoTrim(String[] lines) {
 		for (int i = 0; i < lines.length; i++) {
 			lines[i] = lines[i].trim();
 		}
@@ -123,7 +150,7 @@ public class EasyWinFormatDataImporter implements DataImporter {
 	 *            Index of where to (re)start the search.
 	 * @return The reference index if found, or {@link #INVALID_INDEX} if there are no more lines left to search into or if anything hasn't been found.
 	 */
-	private int nextReferenceIndex(String[] lines, int startIndex) {
+	private static int nextReferenceIndex(String[] lines, int startIndex) {
 		if (startIndex < lines.length) {
 			for (int index = startIndex + 2; index < lines.length; index++) {
 				String line = lines[index];
@@ -137,13 +164,13 @@ public class EasyWinFormatDataImporter implements DataImporter {
 		return INVALID_INDEX;
 	}
 	
-	public <T> void addIfNotNull(List<T> list, T element) {
+	private static <T> void addIfNotNull(List<T> list, T element) {
 		if (element != null && !list.contains(element)) {
 			list.add(element);
 		}
 	}
 	
-	private <T> T where(List<T> list, Predicate<T> validator) {
+	private static <T> T where(List<T> list, Predicate<T> validator) {
 		for (T t : list) {
 			if (validator.test(t)) {
 				return t;
@@ -153,7 +180,7 @@ public class EasyWinFormatDataImporter implements DataImporter {
 		return null;
 	}
 	
-	static boolean isItemContainingInStringArray(String[] array, String itemToCheck) {
+	private static boolean isItemContainingInStringArray(String[] array, String itemToCheck) {
 		for (String string : array) {
 			if (itemToCheck.contains(string)) {
 				return true;

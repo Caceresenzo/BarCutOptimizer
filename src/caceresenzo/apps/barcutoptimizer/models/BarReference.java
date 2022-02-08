@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import caceresenzo.apps.barcutoptimizer.logic.algorithms.CutAlgorithm;
 
@@ -38,16 +39,20 @@ public class BarReference {
 	 * @see BarReference#getCutGroups()
 	 */
 	public List<Cut> getAllCuts() {
-		List<Cut> allCuts = new ArrayList<>();
-		
-		getCutGroups().forEach((cutGroup) -> allCuts.addAll(cutGroup.getCuts()));
-		Cut.sortByLengthAndAngles(allCuts);
-		
-		return allCuts;
+		return getCutGroups()
+				.stream()
+				.map(CutGroup::getCuts)
+				.flatMap(List::stream)
+				.sorted()
+				.collect(Collectors.toList());
 	}
 	
 	public int countAllCuts() {
-		return getCutGroups().stream().map(CutGroup::getCuts).mapToInt(List::size).sum();
+		return getCutGroups()
+				.stream()
+				.map(CutGroup::getCuts)
+				.mapToInt(List::size)
+				.sum();
 	}
 	
 	public Map<Cut, Integer> computeCutCountMap() {
@@ -59,8 +64,9 @@ public class BarReference {
 			Cut deepedCut = null;
 			
 			for (Cut deepCut : map.keySet()) {
-				if (deepCut.hasSameCutProperties(cut)) {
-					countOfThisCut = map.get(deepedCut = deepCut);
+				if (deepCut.equals(cut)) {
+					deepedCut = deepCut;
+					countOfThisCut = map.get(deepedCut);
 					break;
 				}
 			}
@@ -111,23 +117,18 @@ public class BarReference {
 	}
 	
 	public static int countAllCutInList(List<BarReference> barReferences) {
-		int count = 0;
-		
-		for (BarReference barReference : barReferences) {
-			count += barReference.getAllCuts().size();
-		}
-		
-		return count;
+		return barReferences
+				.stream()
+				.mapToInt(BarReference::countAllCuts)
+				.sum();
 	}
 	
 	public static int countAllCutGroupInList(List<BarReference> barReferences) {
-		int count = 0;
-		
-		for (BarReference barReference : barReferences) {
-			count += barReference.getCutGroups().size();
-		}
-		
-		return count;
+		return barReferences
+				.stream()
+				.map(BarReference::getCutGroups)
+				.mapToInt(List::size)
+				.sum();
 	}
 	
 }

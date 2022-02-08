@@ -41,14 +41,20 @@ public class CutTableInput {
 		this.quantity = quantity;
 	}
 	
+	public Cut toCut() {
+		return new Cut(getLength(), getCutAngles());
+	}
+	
 	public static CutTableInput fromCut(Cut cut, int quantity) {
-		CutTableInput cutTableInput = cut.toTableInput();
+		CutTableInput cutTableInput = new CutTableInput();
 		
+		cutTableInput.setLength(cut.getLength());
+		cutTableInput.setCutAngles(cut.getCutAngles());
 		cutTableInput.setQuantity(quantity);
 		
 		return cutTableInput;
 	}
-
+	
 	public static List<CutTableInput> createListFromBarReference(BarReference barReference) {
 		List<CutTableInput> list = new ArrayList<>();
 		Map<Cut, Integer> countMap = barReference.computeCutCountMap();
@@ -59,8 +65,6 @@ public class CutTableInput {
 			
 			list.add(fromCut(cut, quantity));
 		}
-		
-		
 		
 		return list;
 	}

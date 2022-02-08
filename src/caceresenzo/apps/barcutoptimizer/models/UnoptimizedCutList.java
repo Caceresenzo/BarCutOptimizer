@@ -37,7 +37,7 @@ public class UnoptimizedCutList extends CutGroup {
 				continue;
 			}
 			
-			Cut cut = Cut.fromCutTableInput(cutTableInput);
+			Cut cut = cutTableInput.toCut();
 			int quantity = cutTableInput.getQuantity();
 			
 			for (int i = 0; i < quantity; i++) {
