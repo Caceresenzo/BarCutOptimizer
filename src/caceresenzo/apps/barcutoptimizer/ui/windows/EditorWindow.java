@@ -177,7 +177,7 @@ public class EditorWindow implements Constants {
 					if (object instanceof Cut) {
 						Cut cut = (Cut) object;
 						
-						label.setText(I18n.string("editor.tree.item.cut.format", cut.getLength(), cut.getCutAngleA(), cut.getCutAngleB()));
+						label.setText(I18n.string("editor.tree.item.cut.format", cut.getLength(), cut.getLeftAngle(), cut.getRightAngle()));
 					}
 				}
 				

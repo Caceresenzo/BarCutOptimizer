@@ -112,7 +112,7 @@ public class PdfDataExporter implements DataExporter {
 		prepareNewDocument();
 		
 		notifyNextEta(ETA_GENERATING_PDF);
-		int etaCurrentMax = BarReference.countAllCutGroupInList(barReferences) + barReferences.size();
+		int etaCurrentMax = BarReference.countAllCutGroup(barReferences) + barReferences.size();
 		int etaCurrentProgress = 0;
 		
 		int globalPageCounter = 0;
@@ -195,8 +195,8 @@ public class PdfDataExporter implements DataExporter {
 							
 							int usedY2 = 0; /* Set 3 times just for the look ;) */
 							usedY2 = printTextColumn(contentStream, startX + SPACE_BETWEEN_COLUMN * 1, inversedY, I18n.string("exporter.column.length"), cutListToLines(cuts, (cut) -> StringUtils.leftPad(String.valueOf(cut.getLength()), 8)));
-							usedY2 = printTextColumn(contentStream, startX + SPACE_BETWEEN_COLUMN * 2, inversedY, I18n.string("exporter.column.angle.a"), cutListToLines(cuts, (cut) -> StringUtils.leftPad(cut.getCutAngleA() + "°", 7)));
-							usedY2 = printTextColumn(contentStream, startX + SPACE_BETWEEN_COLUMN * 3, inversedY, I18n.string("exporter.column.angle.b"), cutListToLines(cuts, (cut) -> StringUtils.leftPad(cut.getCutAngleB() + "°", 7)));
+							usedY2 = printTextColumn(contentStream, startX + SPACE_BETWEEN_COLUMN * 2, inversedY, I18n.string("exporter.column.angle.a"), cutListToLines(cuts, (cut) -> StringUtils.leftPad(cut.getLeftAngle() + "°", 7)));
+							usedY2 = printTextColumn(contentStream, startX + SPACE_BETWEEN_COLUMN * 3, inversedY, I18n.string("exporter.column.angle.b"), cutListToLines(cuts, (cut) -> StringUtils.leftPad(cut.getRightAngle() + "°", 7)));
 							
 							int usedY = Math.max(usedY1, usedY2);
 							
@@ -270,7 +270,7 @@ public class PdfDataExporter implements DataExporter {
 					Cut cut = entry.getKey();
 					int count = entry.getValue();
 					
-					String angle = String.format("%2s° / %2s°", cut.getCutAngleA(), cut.getCutAngleB());
+					String angle = String.format("%2s° / %2s°", cut.getLeftAngle(), cut.getRightAngle());
 					
 					table.addRow(String.format("%sx", count), cut.getLength(), angle);
 				}
@@ -284,7 +284,7 @@ public class PdfDataExporter implements DataExporter {
 						.addColumn(I18n.string("exporter.word.quantity"))
 						.addColumn(I18n.string("exporter.word.leftover"), Align.RIGHT);
 				
-				Map<Double, Integer> remainingCountMap = barReference.computeRemainingCountMap(() -> new TreeMap<>(Comparator.reverseOrder()));
+				Map<Double, Integer> remainingCountMap = barReference.computeRemainingCountMap(new TreeMap<>(Comparator.reverseOrder()));
 				for (Map.Entry<Double, Integer> entry : remainingCountMap.entrySet()) {
 					double remainingLength = entry.getKey();
 					int count = entry.getValue();

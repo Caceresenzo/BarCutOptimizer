@@ -42,7 +42,7 @@ public class CutTableInput {
 	}
 	
 	public Cut toCut() {
-		return new Cut(getLength(), getCutAngles());
+		return Cut.of(length, cutAngles[0], cutAngles[1]);
 	}
 	
 	public static CutTableInput fromCut(Cut cut, int quantity) {

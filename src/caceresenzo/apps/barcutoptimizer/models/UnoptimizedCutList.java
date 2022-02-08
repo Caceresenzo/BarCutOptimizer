@@ -19,11 +19,6 @@ public class UnoptimizedCutList extends CutGroup {
 		super(barLength, -1, Collections.unmodifiableList(cuts));
 	}
 	
-	/** @return An {@link Collections#unmodifiableList(List) unmodifiable list} of {@link Cut} that need to be optimized. */
-	public List<Cut> getCuts() {
-		return super.getCuts();
-	}
-	
 	@Override
 	public double getRemainingBarLength() {
 		throw new IllegalStateException("Can't get the remaining bar length of an unoptimized cut list.");

@@ -1,43 +1,22 @@
 package caceresenzo.apps.barcutoptimizer.models;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import caceresenzo.apps.barcutoptimizer.logic.algorithms.CutAlgorithm;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
+@Data
+@AllArgsConstructor
 public class BarReference {
 	
 	/* Variables */
 	private final String name;
 	private final List<CutGroup> cutGroups;
 	
-	public BarReference(String name, List<CutGroup> cutGroups) {
-		this.name = name;
-		this.cutGroups = cutGroups;
-	}
-	
-	/** @return Reference's name. */
-	public String getName() {
-		return name;
-	}
-	
-	/** @return The {@link List} of {@link CutGroup} of this reference. */
-	public List<CutGroup> getCutGroups() {
-		return cutGroups;
-	}
-	
-	/**
-	 * Compute and get a {@link List} of all the {@link Cut} that are available in every {@link #getCutGroups() cut group} of this reference.
-	 * 
-	 * @return A, {@link Cut#sortByLengthAndAngles(List) sorted by length}, {@link List} of all the {@link Cut} for this reference.
-	 * @see Cut#sortByLengthAndAngles(List)
-	 * @see BarReference#getCutGroups()
-	 */
 	public List<Cut> getAllCuts() {
 		return getCutGroups()
 				.stream()
@@ -77,34 +56,12 @@ public class BarReference {
 		return map;
 	}
 	
-	public Map<Double, Integer> computeRemainingCountMap(Supplier<Map<Double, Integer>> mapFactory) {
-		Map<Double, Integer> map = mapFactory.get();
-		
+	public Map<Double, Integer> computeRemainingCountMap(Map<Double, Integer> map) {
 		for (CutGroup cutGroup : getCutGroups()) {
 			map.compute(cutGroup.getRemainingBarLength(), (key, value) -> value == null ? 1 : value + 1);
 		}
 		
 		return map;
-	}
-	
-	public UnoptimizedCutList toUnoptimizedCutList(double barLength) {
-		List<Cut> cuts = new ArrayList<>();
-		Map<Cut, Integer> countMap = computeCutCountMap();
-		
-		for (Entry<Cut, Integer> entry : countMap.entrySet()) {
-			Cut cut = entry.getKey();
-			int count = entry.getValue();
-			
-			for (int i = 0; i < count; i++) {
-				cuts.add(cut.clone());
-			}
-		}
-		
-		return new UnoptimizedCutList(barLength, cuts);
-	}
-	
-	public void optimize(CutAlgorithm cutAlgorithm, double barLength) throws Exception {
-		optimize(toUnoptimizedCutList(barLength), cutAlgorithm);
 	}
 	
 	public void optimize(UnoptimizedCutList unoptimizedCutList, CutAlgorithm cutAlgorithm) throws Exception {
@@ -116,14 +73,7 @@ public class BarReference {
 		}
 	}
 	
-	public static int countAllCutInList(List<BarReference> barReferences) {
-		return barReferences
-				.stream()
-				.mapToInt(BarReference::countAllCuts)
-				.sum();
-	}
-	
-	public static int countAllCutGroupInList(List<BarReference> barReferences) {
+	public static int countAllCutGroup(List<BarReference> barReferences) {
 		return barReferences
 				.stream()
 				.map(BarReference::getCutGroups)

@@ -61,13 +61,13 @@ public class BarCutPanel extends JPanel {
 			
 			graphics2d.setColor(index % 2 == 0 ? Color.GRAY : Color.LIGHT_GRAY);
 			
-			if (cut.getCutAngleA() == 45) {
+			if (cut.getLeftAngle() == 45) {
 				leftOffset = angleOffset;
 				
 				graphics2d.fillPolygon(new int[] { x1, x1 + angleOffset, x1 + angleOffset }, new int[] { maxHeight, maxHeight, startY }, 3);
 			}
 			
-			if (cut.getCutAngleB() == 45) {
+			if (cut.getRightAngle() == 45) {
 				rightOffset = angleOffset;
 				
 				graphics2d.fillPolygon(new int[] { x2, x2 - angleOffset, x2 - angleOffset }, new int[] { maxHeight, maxHeight, startY }, 3);

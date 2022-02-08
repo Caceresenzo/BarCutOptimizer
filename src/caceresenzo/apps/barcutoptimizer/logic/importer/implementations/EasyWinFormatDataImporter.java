@@ -123,10 +123,10 @@ public class EasyWinFormatDataImporter implements DataImporter {
 		}
 		
 		double length = Double.valueOf(rawData[zero]);
-		int angleA = (int) (double) Double.valueOf(rawData[zero + 1]);
-		int angleB = (int) (double) Double.valueOf(rawData[zero + 3]);
+		int leftAngle = (int) (double) Double.valueOf(rawData[zero + 1]);
+		int rightAngle = (int) (double) Double.valueOf(rawData[zero + 3]);
 		
-		return new Cut(length, new int[] { angleA, angleB });
+		return Cut.of(length, leftAngle, rightAngle);
 	}
 	
 	/**

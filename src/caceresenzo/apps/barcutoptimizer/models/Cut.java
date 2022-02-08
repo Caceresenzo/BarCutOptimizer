@@ -2,43 +2,25 @@ package caceresenzo.apps.barcutoptimizer.models;
 
 import java.util.Arrays;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Cut implements Cloneable, Comparable<Cut> {
 	
 	private final double length;
 	private final int[] cutAngles;
 	
-	public Cut(double length, int[] cutAngles) {
-		this.length = length;
-		this.cutAngles = checkCutAngles(cutAngles);
-	}
-	
-	public int getCutAngleA() {
+	public int getLeftAngle() {
 		return cutAngles[0];
 	}
 	
-	public int getCutAngleB() {
+	public int getRightAngle() {
 		return cutAngles[1];
-	}
-	
-	public boolean isAngleDegree(int angle, int degree) {
-		if (angle < 0 || angle > 1) {
-			throw new IllegalArgumentException("The angle parameter must be eather 0 or 1.");
-		}
-		
-		return getCutAngles()[angle] == degree;
-	}
-	
-	private static int[] checkCutAngles(int[] cutAngles) {
-		if (cutAngles.length != 2) {
-			throw new IllegalStateException("Invalid cut angles array size. (must be 2 but is " + cutAngles.length + ")");
-		}
-		
-		return cutAngles;
 	}
 	
 	public boolean isFitting(double inLength) {
@@ -59,10 +41,10 @@ public class Cut implements Cloneable, Comparable<Cut> {
 			return result;
 		}
 		
-		int cut1angleA = getCutAngleA();
-		int cut1angleB = getCutAngleB();
-		int cut2angleA = other.getCutAngleA();
-		int cut2angleB = other.getCutAngleB();
+		int cut1angleA = getLeftAngle();
+		int cut1angleB = getRightAngle();
+		int cut2angleA = other.getLeftAngle();
+		int cut2angleB = other.getRightAngle();
 		
 		if ((cut1angleA == 90 && cut1angleB == 90) && (cut2angleA == 90 && cut2angleB == 90)) {
 			return 0;
@@ -95,8 +77,8 @@ public class Cut implements Cloneable, Comparable<Cut> {
 		return 0;
 	}
 	
-	public static Cut of(double length, int angleA, int angleB) {
-		return new Cut(length, new int[] { angleA, angleB });
+	public static Cut of(double length, int leftAngle, int rightAngle) {
+		return new Cut(length, new int[] { leftAngle, rightAngle });
 	}
 	
 }
