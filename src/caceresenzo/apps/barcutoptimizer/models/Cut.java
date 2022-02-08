@@ -1,19 +1,23 @@
 package caceresenzo.apps.barcutoptimizer.models;
 
 import java.util.Arrays;
+import java.util.OptionalDouble;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Cut implements Cloneable, Comparable<Cut> {
 	
 	private final double length;
 	private final int[] cutAngles;
+	private OptionalDouble x = OptionalDouble.empty();
+	
+	private Cut(double length, int[] cutAngles) {
+		this.length = length;
+		this.cutAngles = cutAngles;
+	}
 	
 	public int getLeftAngle() {
 		return cutAngles[0];
@@ -25,6 +29,12 @@ public class Cut implements Cloneable, Comparable<Cut> {
 	
 	public boolean isFitting(double inLength) {
 		return this.length <= inLength;
+	}
+	
+	public Cut setX(double x) {
+		this.x = OptionalDouble.of(x);
+		
+		return this;
 	}
 	
 	@Override

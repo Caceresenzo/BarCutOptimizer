@@ -48,13 +48,23 @@ public class BarCutPanel extends JPanel {
 		List<Cut> cuts = cutGroup.getCuts();
 		Cut lastCutElement = cuts.get(cuts.size() - 1);
 		
-		int eatedLength = 0;
+		double x = 0;
 		for (int index = 0; index < cuts.size(); index++) {
 			Cut cut = cuts.get(index);
 			boolean isLast = cut == lastCutElement;
 			
-			int x1 = (int) (eatedLength * widthRatio) + startX;
-			int x2 = (int) ((eatedLength += cut.getLength()) * widthRatio) + startX;
+			int x1, x2;
+			
+			// TODO Will cause instability if one has a X value and the next don't
+			if (cut.getX().isPresent()) {
+				x = cut.getX().getAsDouble();
+				x1 = (int) (x * widthRatio);
+				x2 = (int) ((x + cut.getLength()) * widthRatio);
+			} else {
+				x1 = (int) (x * widthRatio) + startX;
+				x += cut.getLength();
+				x2 = (int) (x * widthRatio) + startX;
+			}
 			
 			int angleOffset = 15;
 			int leftOffset = 0, rightOffset = 0;
@@ -82,7 +92,7 @@ public class BarCutPanel extends JPanel {
 			
 			if (!isLast) {
 				int spaceBetweenElement = 8;
-				eatedLength += spaceBetweenElement;
+				x += spaceBetweenElement;
 				
 				graphics2d.setColor(Color.WHITE);
 				graphics2d.fillRect(x2, startY, (int) (spaceBetweenElement * widthRatio), maxHeight - startY);

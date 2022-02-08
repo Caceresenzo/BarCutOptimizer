@@ -11,7 +11,11 @@ import caceresenzo.apps.barcutoptimizer.logic.algorithms.annotations.AlgorithmSe
 import caceresenzo.apps.barcutoptimizer.models.Cut;
 import caceresenzo.apps.barcutoptimizer.models.CutGroup;
 import caceresenzo.apps.barcutoptimizer.models.UnoptimizedCutList;
+import lombok.Data;
+import lombok.experimental.Accessors;
 
+@Data
+@Accessors(chain = true)
 public class FillingCutAlgorithm implements CutAlgorithm {
 	
 	@AlgorithmSetting(key = "start-offset")
@@ -48,12 +52,18 @@ public class FillingCutAlgorithm implements CutAlgorithm {
 					throw new CutAlgorithmException("Usable bar length is shorter than a cut.");
 				}
 				
-				if (cut.isFitting(remainingBarLength)) {
+				if (cut.getLength() + cutOffset <= remainingBarLength) {
+					cut.setX(startOffset + usableBarLength - remainingBarLength);
+					
 					iterator.remove();
 					barCuts.add(cut);
 					
 					remainingBarLength -= cut.getLength();
 					remainingBarLength -= cutOffset;
+					
+					if (remainingBarLength < 0) {
+						throw new CutAlgorithmException("Remaining bar length is negative.");
+					}
 				}
 			}
 			
