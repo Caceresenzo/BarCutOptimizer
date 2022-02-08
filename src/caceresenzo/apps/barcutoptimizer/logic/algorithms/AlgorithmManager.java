@@ -2,10 +2,10 @@ package caceresenzo.apps.barcutoptimizer.logic.algorithms;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import caceresenzo.apps.barcutoptimizer.config.I18n;
 import caceresenzo.apps.barcutoptimizer.logic.algorithms.annotations.AlgorithmSetting;
@@ -20,18 +20,14 @@ public class AlgorithmManager {
 	
 	/* Algorithm */
 	private List<CutAlgorithm> algorithms;
-	private Map<CutAlgorithm, List<AlgorithmSettingEntry>> settingEntries;
 	
 	/* Private Constructor */
 	private AlgorithmManager() {
 		this.algorithms = new ArrayList<>();
-		this.settingEntries = new HashMap<>();
 	}
 	
 	public void initialize() {
 		register(new FillingCutAlgorithm());
-		
-		algorithms.forEach((algorithm) -> extractSettingEntries(algorithm));
 	}
 	
 	private void register(CutAlgorithm cutAlgorithm) {
@@ -40,26 +36,14 @@ public class AlgorithmManager {
 		log.info("Added algorithm: {}", cutAlgorithm.getClass().getSimpleName());
 		
 		algorithms.add(cutAlgorithm);
-		settingEntries.put(cutAlgorithm, new ArrayList<>());
-	}
-	
-	private void extractSettingEntries(CutAlgorithm cutAlgorithm) {
-		Class<? extends CutAlgorithm> clazz = cutAlgorithm.getClass();
-		Field[] fields = clazz.getDeclaredFields();
-		
-		for (Field field : fields) {
-			AlgorithmSetting algorithmSetting = field.getAnnotation(AlgorithmSetting.class);
-			
-			if (algorithmSetting != null) {
-				log.info("Found setting: {}", algorithmSetting.key());
-				
-				settingEntries.get(cutAlgorithm).add(new AlgorithmSettingEntry(cutAlgorithm, field, algorithmSetting));
-			}
-		}
 	}
 	
 	public List<AlgorithmSettingEntry> getAlgorithmSettingEntries(CutAlgorithm cutAlgorithm) {
-		return settingEntries.get(cutAlgorithm);
+		return Arrays.asList(cutAlgorithm.getClass().getDeclaredFields())
+				.stream()
+				.filter((field) -> field.isAnnotationPresent(AlgorithmSetting.class))
+				.map((field) -> new AlgorithmSettingEntry(cutAlgorithm, field, field.getAnnotation(AlgorithmSetting.class)))
+				.collect(Collectors.toList());
 	}
 	
 	public static String getBaseTranslationKey(CutAlgorithm cutAlgorithm) {
