@@ -47,7 +47,6 @@ import caceresenzo.apps.barcutoptimizer.ui.others.NewBarReferenceDialogs;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @SuppressWarnings("serial")
 public class EditorWindow implements Constants {
 	
@@ -83,7 +82,7 @@ public class EditorWindow implements Constants {
 		frame.setMinimumSize(new Dimension(800, 500));
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setTitle(I18n.string("application.title"));
+		frame.setTitle(I18n.string("application.title", Constants.VERSION));
 		
 		JScrollPane treeScrollPanel = new JScrollPane();
 		treeScrollPanel.setViewportBorder(null);

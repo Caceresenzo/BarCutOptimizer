@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 
 import caceresenzo.apps.barcutoptimizer.BarCutOptimizer;
 import caceresenzo.apps.barcutoptimizer.assets.Assets;
+import caceresenzo.apps.barcutoptimizer.config.Constants;
 import caceresenzo.apps.barcutoptimizer.config.I18n;
 import caceresenzo.apps.barcutoptimizer.ui.components.BigButton;
 import caceresenzo.apps.barcutoptimizer.ui.others.CreateNewDialogs;
@@ -41,7 +42,7 @@ public class StartWindow {
 	private void initialize() {
 		frame = new JFrame();
 		frame.setSize(480, 300);
-		frame.setTitle(I18n.string("application.title"));
+		frame.setTitle(I18n.string("application.title", Constants.VERSION));
 		frame.setLocationRelativeTo(null);
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
