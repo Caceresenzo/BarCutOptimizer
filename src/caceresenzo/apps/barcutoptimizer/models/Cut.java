@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.OptionalDouble;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 @Data
@@ -12,6 +13,8 @@ public class Cut implements Cloneable, Comparable<Cut> {
 	
 	private final double length;
 	private final int[] cutAngles;
+	
+	@EqualsAndHashCode.Exclude
 	private OptionalDouble x = OptionalDouble.empty();
 	
 	private Cut(double length, int[] cutAngles) {
