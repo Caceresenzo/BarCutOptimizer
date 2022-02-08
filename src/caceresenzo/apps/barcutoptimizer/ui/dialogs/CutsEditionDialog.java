@@ -75,7 +75,6 @@ public class CutsEditionDialog extends JDialog implements Constants {
 	private final BarReference barReference;
 	private final CutsEditionDialog.Callback callback;
 	private double barLength;
-	private boolean hasUserChangedData = false;
 	
 	/**
 	 * Create the dialog.
@@ -380,12 +379,6 @@ public class CutsEditionDialog extends JDialog implements Constants {
 		CutsEditionDialog dialog = new CutsEditionDialog(parent, barReference, callback);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
-		
-		// dialog.addComponentListener(new ComponentAdapter() {
-		// public void componentResized(ComponentEvent e) {
-		// System.out.println(String.format("%s %s", dialog.getWidth(), dialog.getHeight()));
-		// }
-		// });
 		
 		return dialog;
 	}
