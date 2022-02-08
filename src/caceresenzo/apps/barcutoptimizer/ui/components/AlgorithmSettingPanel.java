@@ -27,9 +27,6 @@ public class AlgorithmSettingPanel extends JPanel {
 	/* Variables */
 	private final AlgorithmSettingEntry algorithmSettingEntry;
 	
-	/* Swing fix... */
-	private boolean textFieldForcedSetText = false;
-	
 	/**
 	 * Create the panel.
 	 */
@@ -43,6 +40,7 @@ public class AlgorithmSettingPanel extends JPanel {
 		
 		textField = new JTextField();
 		textField.setColumns(10);
+		textField.setText(String.valueOf(algorithmSettingEntry.getValue()));
 		
 		actualValueLabel = new JLabel("actual value");
 		actualValueLabel.setHorizontalAlignment(SwingConstants.TRAILING);
@@ -103,10 +101,6 @@ public class AlgorithmSettingPanel extends JPanel {
 			}
 			
 			private void sendUpdate() {
-				if (textFieldForcedSetText) {
-					return;
-				}
-				
 				SwingUtilities.invokeLater(() -> validateInput(textField.getText()));
 			}
 		});
@@ -129,10 +123,7 @@ public class AlgorithmSettingPanel extends JPanel {
 			textField.setToolTipText("");
 		}
 		
-		textFieldForcedSetText = true;
-		textField.setText(String.valueOf(object));
 		textField.setForeground(success ? Color.BLACK : Color.RED);
-		textFieldForcedSetText = false;
 		
 		actualValueLabel.setText(String.valueOf(algorithmSettingEntry.getValue()));
 	}
