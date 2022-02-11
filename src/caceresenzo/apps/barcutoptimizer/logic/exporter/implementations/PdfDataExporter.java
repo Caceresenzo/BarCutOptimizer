@@ -119,19 +119,24 @@ public class PdfDataExporter implements DataExporter {
 		
 		{ /* references */
 			int referencesCount = barReferences.size();
-			int allCutCount = barReferences.stream().mapToInt(BarReference::countAllCuts).sum();
 			String multipleElementLetter = I18n.string("multiple-element-letter");
-			String extra = I18n.string("exporter.references-count.extra", allCutCount, allCutCount > 1 ? multipleElementLetter : "", referencesCount, referencesCount > 1 ? multipleElementLetter : "");
 			
 			Table table = new Table()
 					.setTitle(I18n.string("exporter.references-count.title"))
-					.setExtra(extra)
 					.addColumn(I18n.string("exporter.word.name"))
 					.addColumn(I18n.string("exporter.word.quantity"));
 			
+			int total = 0;
+			
 			for (BarReference barReference : barReferences) {
-				table.addRow(barReference.getName(), barReference.getAllCuts().size());
+				int count = barReference.getCutGroups().size();
+				
+				table.addRow(barReference.getName(), count);
+				
+				total += count;
 			}
+			
+			table.setExtra(I18n.string("exporter.references-count.extra", total, total > 1 ? multipleElementLetter : "", referencesCount, referencesCount > 1 ? multipleElementLetter : ""));
 			
 			globalPageCounter = printTable(table, globalPageCounter);
 		}
