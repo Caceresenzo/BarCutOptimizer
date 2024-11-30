@@ -27,6 +27,9 @@ public class ImportDialogs {
 	private final ProgressDialog progressDialog;
 
 	/* Private Constructor */
+	/**
+	 * @wbp.parser.entryPoint
+	 */
 	private ImportDialogs() {
 		this.progressDialog = new ProgressDialog(null, true, I18n.string("dialog.loading-import.title"), I18n.string("dialog.loading-import.message"));
 		this.progressDialog.getProgressBar().setIndeterminate(true);

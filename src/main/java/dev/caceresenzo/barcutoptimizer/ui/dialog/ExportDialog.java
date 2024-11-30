@@ -74,15 +74,17 @@ public class ExportDialog extends JDialog {
 		GroupLayout gl_contentPanel = new GroupLayout(contentPanel);
 		gl_contentPanel.setHorizontalGroup(
 			gl_contentPanel.createParallelGroup(Alignment.LEADING)
-				.addComponent(filePanel, GroupLayout.DEFAULT_SIZE, 424, Short.MAX_VALUE)
-				.addComponent(progressPanel, GroupLayout.DEFAULT_SIZE, 424, Short.MAX_VALUE));
+				.addComponent(progressPanel, GroupLayout.DEFAULT_SIZE, 426, Short.MAX_VALUE)
+				.addComponent(filePanel, GroupLayout.DEFAULT_SIZE, 426, Short.MAX_VALUE)
+		);
 		gl_contentPanel.setVerticalGroup(
 			gl_contentPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPanel.createSequentialGroup()
-					.addComponent(filePanel, GroupLayout.PREFERRED_SIZE, 64, GroupLayout.PREFERRED_SIZE)
+					.addComponent(filePanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(progressPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(29, Short.MAX_VALUE)));
+					.addContainerGap(34, Short.MAX_VALUE))
+		);
 
 		etaLabel = new JLabel(I18n.string("export.eta.not-even-started"));
 		etaLabel.setFont(etaLabel.getFont().deriveFont(etaLabel.getFont().getSize() + 8f));
@@ -124,18 +126,20 @@ public class ExportDialog extends JDialog {
 					.addContainerGap()
 					.addComponent(selectFileButton)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(filePathTextField, GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE)
-					.addContainerGap()));
+					.addComponent(filePathTextField, GroupLayout.DEFAULT_SIZE, 310, Short.MAX_VALUE)
+					.addContainerGap())
+		);
 		gl_filePanel.setVerticalGroup(
 			gl_filePanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_filePanel.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_filePanel.createParallelGroup(Alignment.BASELINE)
-						.addComponent(selectFileButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(selectFileButton, GroupLayout.DEFAULT_SIZE, 33, Short.MAX_VALUE)
 						.addGroup(gl_filePanel.createSequentialGroup()
 							.addGap(1)
-							.addComponent(filePathTextField, GroupLayout.DEFAULT_SIZE, 22, Short.MAX_VALUE)))
-					.addGap(7)));
+							.addComponent(filePathTextField, GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)))
+					.addGap(7))
+		);
 		filePanel.setLayout(gl_filePanel);
 		contentPanel.setLayout(gl_contentPanel);
 		JPanel buttonPane = new JPanel();
