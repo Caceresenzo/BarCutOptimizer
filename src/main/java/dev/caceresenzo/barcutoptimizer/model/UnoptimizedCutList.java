@@ -25,16 +25,15 @@ public class UnoptimizedCutList extends CutGroup {
 	public static UnoptimizedCutList fromCutTableInputs(List<CutTableInput> cutTableInputs, double barLength) {
 		List<Cut> cuts = new ArrayList<>();
 
-		for (CutTableInput cutTableInput : cutTableInputs) {
-			if (!cutTableInput.hasLength()) {
+		for (CutTableInput input : cutTableInputs) {
+			if (!input.hasLength()) {
 				continue;
 			}
 
-			Cut cut = cutTableInput.toCut();
-			int quantity = cutTableInput.getQuantity();
+			int quantity = input.getQuantity();
 
 			for (int i = 0; i < quantity; i++) {
-				cuts.add(cut);
+				cuts.add(input.toCut());
 			}
 		}
 
