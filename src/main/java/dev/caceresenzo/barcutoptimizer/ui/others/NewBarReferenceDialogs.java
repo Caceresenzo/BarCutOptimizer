@@ -6,7 +6,7 @@ import javax.swing.JOptionPane;
 
 import org.apache.commons.lang3.StringUtils;
 
-import dev.caceresenzo.barcutoptimizer.config.I18n;
+import dev.caceresenzo.barcutoptimizer.language.I18n;
 import dev.caceresenzo.barcutoptimizer.models.BarReference;
 import dev.caceresenzo.barcutoptimizer.ui.BarCutOptimizerWindow;
 

@@ -15,7 +15,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
 
-import dev.caceresenzo.barcutoptimizer.config.I18n;
+import dev.caceresenzo.barcutoptimizer.language.I18n;
 import dev.caceresenzo.barcutoptimizer.logic.algorithms.AlgorithmManager;
 import dev.caceresenzo.barcutoptimizer.ui.BarCutOptimizerWindow;
 import lombok.extern.slf4j.Slf4j;

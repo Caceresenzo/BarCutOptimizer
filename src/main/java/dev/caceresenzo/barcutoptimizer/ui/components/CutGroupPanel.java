@@ -10,7 +10,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 
-import dev.caceresenzo.barcutoptimizer.config.I18n;
+import dev.caceresenzo.barcutoptimizer.language.I18n;
 import dev.caceresenzo.barcutoptimizer.models.CutGroup;
 
 @SuppressWarnings("serial")

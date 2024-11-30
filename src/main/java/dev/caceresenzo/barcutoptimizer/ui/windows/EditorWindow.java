@@ -34,8 +34,8 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import dev.caceresenzo.barcutoptimizer.assets.Assets;
-import dev.caceresenzo.barcutoptimizer.config.Constants;
-import dev.caceresenzo.barcutoptimizer.config.I18n;
+import dev.caceresenzo.barcutoptimizer.constants.Constants;
+import dev.caceresenzo.barcutoptimizer.language.I18n;
 import dev.caceresenzo.barcutoptimizer.models.BarReference;
 import dev.caceresenzo.barcutoptimizer.models.Cut;
 import dev.caceresenzo.barcutoptimizer.models.CutGroup;
@@ -47,7 +47,7 @@ import dev.caceresenzo.barcutoptimizer.ui.others.NewBarReferenceDialogs;
 import lombok.Getter;
 
 @SuppressWarnings("serial")
-public class EditorWindow implements Constants {
+public class EditorWindow {
 
 	/* Components */
 	private @Getter JFrame frame;
@@ -284,11 +284,11 @@ public class EditorWindow implements Constants {
 		for (BarReference barReference : barReferences) {
 			DefaultMutableTreeNode barReferenceNode = new DefaultMutableTreeNode(barReference);
 
-			if (SHOW_CUT_GROUPS_IN_EDITOR_TREE) {
+			if (Constants.SHOW_CUT_GROUPS_IN_EDITOR_TREE) {
 				for (CutGroup cutGroup : barReference.getCutGroups()) {
 					DefaultMutableTreeNode cutGroupNode = new DefaultMutableTreeNode(cutGroup);
 
-					if (SHOW_CUTS_IN_EDITOR_TREE) {
+					if (Constants.SHOW_CUTS_IN_EDITOR_TREE) {
 						for (Cut cut : cutGroup.getCuts()) {
 							DefaultMutableTreeNode cutNode = new DefaultMutableTreeNode(cut);
 

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import dev.caceresenzo.barcutoptimizer.config.I18n;
+import dev.caceresenzo.barcutoptimizer.language.I18n;
 import dev.caceresenzo.barcutoptimizer.logic.algorithms.annotations.AlgorithmSetting;
 import dev.caceresenzo.barcutoptimizer.logic.algorithms.impl.FillingCutAlgorithm;
 import lombok.extern.slf4j.Slf4j;

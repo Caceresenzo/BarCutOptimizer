@@ -33,8 +33,8 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 import dev.caceresenzo.barcutoptimizer.BarCutOptimizer;
 import dev.caceresenzo.barcutoptimizer.assets.Assets;
-import dev.caceresenzo.barcutoptimizer.config.Constants;
-import dev.caceresenzo.barcutoptimizer.config.I18n;
+import dev.caceresenzo.barcutoptimizer.constants.Constants;
+import dev.caceresenzo.barcutoptimizer.language.I18n;
 import dev.caceresenzo.barcutoptimizer.logic.algorithms.impl.FillingCutAlgorithm;
 import dev.caceresenzo.barcutoptimizer.logic.exporter.DataExporter;
 import dev.caceresenzo.barcutoptimizer.logic.exporter.ExporterCallback;

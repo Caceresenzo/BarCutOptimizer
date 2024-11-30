@@ -8,8 +8,8 @@ import javax.swing.JPanel;
 
 import dev.caceresenzo.barcutoptimizer.BarCutOptimizer;
 import dev.caceresenzo.barcutoptimizer.assets.Assets;
-import dev.caceresenzo.barcutoptimizer.config.Constants;
-import dev.caceresenzo.barcutoptimizer.config.I18n;
+import dev.caceresenzo.barcutoptimizer.constants.Constants;
+import dev.caceresenzo.barcutoptimizer.language.I18n;
 import dev.caceresenzo.barcutoptimizer.ui.components.BigButton;
 import dev.caceresenzo.barcutoptimizer.ui.others.CreateNewDialogs;
 import dev.caceresenzo.barcutoptimizer.ui.others.ImportDialogs;

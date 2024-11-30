@@ -42,18 +42,18 @@ import javax.swing.table.AbstractTableModel;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
-import dev.caceresenzo.barcutoptimizer.config.Constants;
-import dev.caceresenzo.barcutoptimizer.config.I18n;
+import dev.caceresenzo.barcutoptimizer.constants.Constants;
+import dev.caceresenzo.barcutoptimizer.language.I18n;
 import dev.caceresenzo.barcutoptimizer.logic.algorithms.AlgorithmManager;
-import dev.caceresenzo.barcutoptimizer.logic.algorithms.CutAlgorithm;
 import dev.caceresenzo.barcutoptimizer.logic.algorithms.AlgorithmManager.AlgorithmSettingEntry;
+import dev.caceresenzo.barcutoptimizer.logic.algorithms.CutAlgorithm;
 import dev.caceresenzo.barcutoptimizer.models.BarReference;
 import dev.caceresenzo.barcutoptimizer.models.CutTableInput;
 import dev.caceresenzo.barcutoptimizer.models.UnoptimizedCutList;
 import dev.caceresenzo.barcutoptimizer.ui.components.AlgorithmSettingPanel;
 
 @SuppressWarnings("serial")
-public class CutsEditionDialog extends JDialog implements Constants {
+public class CutsEditionDialog extends JDialog {
 	
 	/* Constants */
 	public static final double INVALID_LENGTH = -1;
@@ -320,7 +320,7 @@ public class CutsEditionDialog extends JDialog implements Constants {
 	}
 	
 	private void initializeTextFields() {
-		double initialValue = COMMON_BAR_LENGTH;
+		double initialValue = Constants.COMMON_BAR_LENGTH;
 		
 		if (!barReference.getCutGroups().isEmpty()) {
 			initialValue = barReference.getCutGroups().get(0).getBarLength();
