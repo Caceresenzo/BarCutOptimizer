@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 public class CutTableInput {
 
 	public static final double INVALID_LENGTH = -1;
+	public static final double ANGLE_MINIMUM = 1;
+	public static final double ANGLE_MAXIMUM = 179;
 
 	private double length = INVALID_LENGTH;
 	private double leftAngle = 90.0;
@@ -27,11 +29,11 @@ public class CutTableInput {
 	}
 
 	public void setLeftAngle(double leftAngle) {
-		this.leftAngle = round(leftAngle);
+		this.leftAngle = safeAngle(leftAngle);
 	}
 
 	public void setRightAngle(double rightAngle) {
-		this.rightAngle = round(rightAngle);
+		this.rightAngle = safeAngle(rightAngle);
 	}
 
 	public boolean hasLength() {
@@ -65,8 +67,12 @@ public class CutTableInput {
 		return list;
 	}
 
-	private static double round(double x) {
-		return Math.round(x * 100d) / 100d;
+	private static double safeAngle(double x) {
+		return Math.clamp(
+			Math.round(x * 100d) / 100d,
+			ANGLE_MINIMUM,
+			ANGLE_MAXIMUM
+		);
 	}
 
 }
