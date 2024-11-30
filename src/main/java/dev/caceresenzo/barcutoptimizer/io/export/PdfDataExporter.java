@@ -938,10 +938,11 @@ public class PdfDataExporter implements DataExporter {
 		BarReference dummy = new BarReference("Hello", new ArrayList<>());
 		dummy.optimize(UnoptimizedCutList.fromCutTableInputs(getRandomCuts(), 6500.0), new FillingCutAlgorithm());
 
-		BarReference dummy2 = new BarReference("Hello 2", new ArrayList<>());
-		dummy2.optimize(UnoptimizedCutList.fromCutTableInputs(getRandomCuts(), 4000.0), new FillingCutAlgorithm());
+		//		BarReference dummy2 = new BarReference("Hello 2", new ArrayList<>());
+		//		dummy2.optimize(UnoptimizedCutList.fromCutTableInputs(getRandomCuts(), 4000.0), new FillingCutAlgorithm());
 
-		new PdfDataExporter().exportToFile(Arrays.asList(dummy, dummy2), file);
+		//		new PdfDataExporter().exportToFile(Arrays.asList(dummy, dummy2), file);
+		new PdfDataExporter().exportToFile(Arrays.asList(dummy), file);
 
 		// BarReference dummy3 = new BarReference("Hello 2", new ArrayList<>());
 		// dummy3.optimize(UnoptimizedCutList.fromCutTableInputs(getCutsAt(265.3, 22), 6500.0), new FillingCutAlgorithm());
@@ -956,14 +957,28 @@ public class PdfDataExporter implements DataExporter {
 
 		Random random = ThreadLocalRandom.current();
 
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 40; i++) {
 			inputs.add(new CutTableInput(
-				ThreadLocalRandom.current().nextInt(500, 2500),
-				random.nextBoolean() ? 90 : 45,
-				random.nextBoolean() ? 90 : 45,
-				ThreadLocalRandom.current().nextInt(1, 8)
+				ThreadLocalRandom.current().nextInt(500, 800),
+				random.nextDouble(30, 150),
+				random.nextDouble(30, 150),
+				10
 			));
 		}
+
+		//		inputs.add(new CutTableInput(
+		//			950d,
+		//			10,
+		//			10,
+		//			5
+		//		));
+		//
+		////		inputs.add(new CutTableInput(
+		////			1500d,
+		////			150d,
+		////			150d,
+		////			1
+		////		));
 
 		return inputs;
 	}
