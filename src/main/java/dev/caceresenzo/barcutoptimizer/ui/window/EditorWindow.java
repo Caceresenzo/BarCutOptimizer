@@ -16,6 +16,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -43,6 +45,7 @@ import dev.caceresenzo.barcutoptimizer.ui.component.BarReferenceInfoPanel;
 import dev.caceresenzo.barcutoptimizer.ui.component.CutGroupPanel;
 import dev.caceresenzo.barcutoptimizer.ui.dialog.CutsEditionDialog;
 import dev.caceresenzo.barcutoptimizer.ui.dialog.ExportDialog;
+import dev.caceresenzo.barcutoptimizer.ui.other.ImportDialogs;
 import dev.caceresenzo.barcutoptimizer.ui.other.NewBarReferenceDialogs;
 import lombok.Getter;
 
@@ -62,6 +65,9 @@ public class EditorWindow {
 	/* Variables */
 	private List<BarReference> barReferences;
 	private DefaultMutableTreeNode rootNode;
+	private JMenuBar menuBar;
+	private JMenu menu;
+	private JMenuItem menuItem;
 
 	/**
 	 * Create the application.
@@ -150,6 +156,22 @@ public class EditorWindow {
 		}
 
 		frame.pack();
+
+		menuBar = new JMenuBar();
+		frame.setJMenuBar(menuBar);
+
+		menu = new JMenu(I18n.string("editor.menu.import"));
+		menuBar.add(menu);
+
+		menuItem = new JMenuItem(I18n.string("editor.menu.import.easywin"), new ImageIcon(EditorWindow.class.getResource(Assets.ICON_PDF_SMALL)));
+		menuItem.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				ImportDialogs.get().startImportationProcess();
+			}
+
+		});
+		menu.add(menuItem);
 	}
 
 	private void initializeTree() {

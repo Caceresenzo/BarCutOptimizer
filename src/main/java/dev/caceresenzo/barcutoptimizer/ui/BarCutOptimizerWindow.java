@@ -30,10 +30,6 @@ public class BarCutOptimizerWindow {
 		}
 	}
 
-	public void openStart() {
-		window = StartWindow.open().getFrame();
-	}
-
 	public void openFile(File fileToOpen) {
 		ImportDialogs.get().forceImportProcess(fileToOpen);
 	}

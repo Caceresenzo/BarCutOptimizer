@@ -17,7 +17,7 @@ import dev.caceresenzo.barcutoptimizer.model.CutGroup;
 public class EasyWinFormatDataImporter implements DataImporter {
 
 	public static final String NEW_BAR_REGEX = "[\\d]+x [\\d]+ .*";
-	public static final String NEW_REFERENCE_SEPERATOR = "BARRE N�/REP LONG. COUP1 COUP2 P CASE CHUTE";
+	public static final String NEW_REFERENCE_SEPERATOR = "BARRE N°/REP LONG. COUP1 COUP2 P CASE CHUTE";
 	public static final String PAGE_SEPARATOR_PREFIX = "DEBITS PROFILS ";
 	public static final String[] BAR_REFERENCE_WORD_BLACKLIST = { "FICTIF", "FICTIVE" };
 
@@ -25,25 +25,16 @@ public class EasyWinFormatDataImporter implements DataImporter {
 
 	@Override
 	public List<BarReference> loadFromFile(File file) throws Exception {
-		PDDocument document = PDDocument.load(file);
+		try (PDDocument document = PDDocument.load(file)) {
+			if (document.isEncrypted()) {
+				throw new IllegalStateException("The PDF file is encrypted, please decrypt it before importing.");
+			}
 
-		boolean isEncrypted = document.isEncrypted();
-		List<BarReference> barReferences = null;
-
-		if (!isEncrypted) {
 			PDFTextStripper stripper = new PDFTextStripper();
 			String text = stripper.getText(document);
 
-			barReferences = process(text);
+			return process(text);
 		}
-
-		document.close();
-
-		if (isEncrypted) {
-			throw new IllegalStateException("The PDF file is encrypted, please decrypt it before importing.");
-		}
-
-		return barReferences;
 	}
 
 	private List<BarReference> process(String rawText) {
@@ -109,7 +100,7 @@ public class EasyWinFormatDataImporter implements DataImporter {
 		for (int index = 0; index < rawData.length; index++) {
 			String part = rawData[index];
 
-			if (part.toCharArray()[0] == '�') {
+			if (part.charAt(0) == '°') {
 				firstDegreeCharOffset = index;
 				break;
 			}

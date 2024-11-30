@@ -2,6 +2,7 @@ package dev.caceresenzo.barcutoptimizer;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Locale;
 
 import javax.swing.JOptionPane;
@@ -52,7 +53,7 @@ public class BarCutOptimizer {
 		BarCutOptimizerWindow.get().initialize();
 
 		if (fileToOpen == null) {
-			BarCutOptimizerWindow.get().openStart();
+			BarCutOptimizerWindow.get().openEditor(new ArrayList<>());
 		} else {
 			BarCutOptimizerWindow.get().openFile(fileToOpen);
 		}
