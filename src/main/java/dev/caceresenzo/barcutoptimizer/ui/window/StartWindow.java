@@ -31,6 +31,7 @@ public class StartWindow {
 	
 	/**
 	 * Create the application.
+	 * @wbp.parser.entryPoint
 	 */
 	private StartWindow() {
 		initialize();

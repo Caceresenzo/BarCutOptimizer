@@ -102,28 +102,29 @@ public class EditorWindow {
 						.addGroup(groupLayout.createSequentialGroup()
 							.addComponent(addNewBarReferenceButton, GroupLayout.PREFERRED_SIZE, 247, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(exportButton, GroupLayout.PREFERRED_SIZE, 252, Short.MAX_VALUE)
+							.addComponent(editCutsButton, GroupLayout.DEFAULT_SIZE, 399, Short.MAX_VALUE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(editCutsButton, GroupLayout.PREFERRED_SIZE, 249, Short.MAX_VALUE))
+							.addComponent(exportButton, GroupLayout.DEFAULT_SIZE, 374, Short.MAX_VALUE))
 						.addGroup(groupLayout.createSequentialGroup()
 							.addComponent(treeScrollPanel, GroupLayout.PREFERRED_SIZE, 247, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(cutGroupListScrollPanel, GroupLayout.DEFAULT_SIZE, 507, Short.MAX_VALUE)))
-					.addContainerGap()));
+							.addComponent(cutGroupListScrollPanel, GroupLayout.DEFAULT_SIZE, 778, Short.MAX_VALUE)))
+					.addContainerGap())
+		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(cutGroupListScrollPanel, GroupLayout.DEFAULT_SIZE, 403, Short.MAX_VALUE)
-						.addComponent(treeScrollPanel, GroupLayout.DEFAULT_SIZE, 403, Short.MAX_VALUE))
+						.addComponent(cutGroupListScrollPanel, GroupLayout.DEFAULT_SIZE, 416, Short.MAX_VALUE)
+						.addComponent(treeScrollPanel, GroupLayout.DEFAULT_SIZE, 416, Short.MAX_VALUE))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false)
-						.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE, false)
-							.addComponent(exportButton)
-							.addComponent(editCutsButton))
-						.addComponent(addNewBarReferenceButton))
-					.addContainerGap()));
+					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+						.addComponent(addNewBarReferenceButton)
+						.addComponent(editCutsButton)
+						.addComponent(exportButton))
+					.addContainerGap())
+		);
 
 		cutGroupListContainerPanel = new JPanel();
 		cutGroupListScrollPanel.setViewportView(cutGroupListContainerPanel);
