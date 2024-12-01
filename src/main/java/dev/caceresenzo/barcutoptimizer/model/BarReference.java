@@ -62,6 +62,10 @@ public class BarReference {
 
 	public Map<Double, Integer> computeRemainingCountMap(Map<Double, Integer> map) {
 		for (CutGroup cutGroup : getCutGroups()) {
+			if (cutGroup.isRemainingBarLengthUnknown()) {
+				continue;
+			}
+
 			map.compute(cutGroup.getRemainingBarLength(), (key, value) -> value == null ? 1 : value + 1);
 		}
 
