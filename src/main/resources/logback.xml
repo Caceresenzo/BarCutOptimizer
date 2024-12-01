@@ -9,7 +9,7 @@
 		</layout>
 	</appender>
 
-	<logger name="caceresenzo" level="trace" additivity="false">
+	<logger name="dev.caceresenzo" level="trace" additivity="false">
 		<appender-ref ref="CONSOLE" />
 	</logger>
 
