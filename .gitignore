@@ -1,3 +1,5 @@
 /target/
 /.settings/
 /*.pdf
+/release/
+/dependency-reduced-pom.xml
