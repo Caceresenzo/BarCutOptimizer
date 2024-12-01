@@ -2,6 +2,7 @@ package dev.caceresenzo.barcutoptimizer.io.export;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,15 +51,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PdfDataExporter implements DataExporter {
 
-	/* Callback Constants */
 	public static final String ETA_INITIALIZING = "initializing";
 	public static final String ETA_GENERATING_PDF = "generating-pdf";
-	public static final String ETA_CLEANING_UP = "cleaning-up";
 	public static final String ETA_OPENING_RESULT = "opening-result";
 
-	public static final int ETA_COUNT = 4;
+	public static final int ETA_COUNT = 3;
 
-	/* Constants */
 	public static final String CUT_GROUP_FILE_FORMAT = "group-%s.png";
 
 	public static final int BAR_CUT_RENDER_WIDTH = 800;
@@ -74,41 +72,19 @@ public class PdfDataExporter implements DataExporter {
 	public static final int SMALL_SPACE_BETWEEN_COLUMN = (int) (PAGE_MARGIN_HORIZONTAL * (FONT_SIZE / 8f));
 
 	public static final boolean ADD_LINE_BETWEEN_CELL_IN_COUNT_TABLE = true;
-	public static final boolean CLEANUP_AFTER_EXPORTING = true;
 	public static final boolean OPEN_FILE_AT_END = true;
 	public static final boolean ENABLE_WARNING = true;
 
 	public static final float LOW_REMAINING_THRESHOLD = 10.0f;
 
-	/* Callback */
 	private ExporterCallback callback;
 
-	/* Variables */
 	private PDDocument document;
 	private PDFont font;
-
-	private final List<File> temporaryFiles;
-
-	/* Constructor */
-	@SuppressWarnings("serial")
-	public PdfDataExporter() {
-		this.temporaryFiles = new ArrayList<File>() {
-
-			@Override
-			public boolean add(File file) {
-				file.deleteOnExit();
-				return super.add(file);
-			}
-
-		};
-	}
 
 	@Override
 	public void exportToFile(List<BarReference> barReferences, File file) throws Exception {
 		notifyInitialization();
-
-		File exportCacheFolder = new File(BarCutOptimizer.CACHE_FOLDER, "export");
-		File exportTemporaryFolder = new File(exportCacheFolder, UUID.randomUUID().toString());
 
 		prepareNewDocument();
 
@@ -143,8 +119,6 @@ public class PdfDataExporter implements DataExporter {
 		}
 
 		for (BarReference barReference : barReferences) {
-			File barReferenceBaseFolder = new File(exportTemporaryFolder, FileSystem.getCurrent().toLegalFileName(barReference.getName(), '_'));
-
 			List<CutGroup> cutGroups = barReference.getCutGroups();
 			ListIterator<CutGroup> iterator = cutGroups.listIterator();
 
@@ -166,12 +140,11 @@ public class PdfDataExporter implements DataExporter {
 						break;
 					}
 
-					File cutGroupFile = new File(barReferenceBaseFolder, String.format(CUT_GROUP_FILE_FORMAT, localIndex));
-
 					try {
-						saveCutGroupPicture(cutGroup, cutGroupFile);
+						ByteArrayOutputStream imageBytes = new ByteArrayOutputStream();
+						ImageIO.write(renderCutGroup(cutGroup), "png", imageBytes);
 
-						PDImageXObject pdImage = PDImageXObject.createFromFile(cutGroupFile.getAbsolutePath(), document);
+						PDImageXObject pdImage = PDImageXObject.createFromByteArray(document, imageBytes.toByteArray(), String.format(CUT_GROUP_FILE_FORMAT, localIndex));
 
 						try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, false)) {
 							if (evenLocalIndex == 0) {
@@ -206,13 +179,13 @@ public class PdfDataExporter implements DataExporter {
 
 							int usedY = Math.max(usedY1, usedY2);
 
-							printSimpleHorizontalLine(contentStream, startX, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, (float) (inversedY - (FONT_SIZE * 1.4f)));
-							printSimpleVerticalLine(contentStream, (float) ((startX + SPACE_BETWEEN_COLUMN) * 0.91), inversedY, (float) (inversedY - usedY - (FONT_SIZE * 1.4f)));
+							printSimpleHorizontalLine(contentStream, startX, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, (inversedY - (FONT_SIZE * 1.4f)));
+							printSimpleVerticalLine(contentStream, (float) ((startX + SPACE_BETWEEN_COLUMN) * 0.91), inversedY, (inversedY - usedY - (FONT_SIZE * 1.4f)));
 
 							/* Printing the remaining bar length */
-							printSimpleHorizontalLine(contentStream, startX, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, (float) (inversedY - usedY));
-							printSimpleHorizontalLine(contentStream, startX, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, (float) (inversedY - (FONT_SIZE * 1.4f) - usedY));
-							printSimpleText(contentStream, startX, (float) (inversedY - FONT_SIZE - usedY), FONT_SIZE, "CHUTE");
+							printSimpleHorizontalLine(contentStream, startX, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, (inversedY - usedY));
+							printSimpleHorizontalLine(contentStream, startX, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, (inversedY - (FONT_SIZE * 1.4f) - usedY));
+							printSimpleText(contentStream, startX, (inversedY - FONT_SIZE - usedY), FONT_SIZE, "CHUTE");
 
 							String barLengthString = String.valueOf(cutGroup.getRemainingBarLength());
 							if (cutGroup.isRemainingBarLengthUnknown()) {
@@ -238,8 +211,6 @@ public class PdfDataExporter implements DataExporter {
 
 							currentY += usedY;
 						}
-
-						log.info("Y: {} -> inserted image: {}", currentY, cutGroupFile.getPath());
 					} catch (Exception exception) {
 						exception.printStackTrace();
 					}
@@ -302,16 +273,9 @@ public class PdfDataExporter implements DataExporter {
 			}
 
 			publishProgress(etaCurrentMax, ++etaCurrentProgress);
-
-			temporaryFiles.add(barReferenceBaseFolder);
 		}
 
 		finishDocument(file);
-
-		if (CLEANUP_AFTER_EXPORTING) {
-			notifyNextEta(ETA_CLEANING_UP);
-			cleanUpTemporaryFiles(exportTemporaryFolder);
-		}
 
 		if (OPEN_FILE_AT_END) {
 			notifyNextEta(ETA_OPENING_RESULT);
@@ -395,32 +359,11 @@ public class PdfDataExporter implements DataExporter {
 
 				return bufferedImage;
 			} catch (NullPointerException exception) {
+				exception.printStackTrace();
 				log.warn("javax.swing.RepaintManager.getVolatileOffscreenBuffer() -> java.lang.NullPointerException");
 				// exception.printStackTrace();
 			}
 		}
-	}
-
-	/**
-	 * Save the {@link BufferedImage buffered image} returned by {@link #renderCutGroup(CutGroup)} to a <code>file</code>.<br>
-	 * Also the <code>file</code> will be added to the {@link List list} of temporary files.
-	 * 
-	 * @param cutGroup
-	 *            {@link CutGroup Cut group} that will be render.
-	 * @param file
-	 *            Target file to save it.
-	 * @throws IOException
-	 *             If an error occurs during writing.
-	 */
-	private void saveCutGroupPicture(CutGroup cutGroup, File file) throws IOException {
-		if (!file.exists()) {
-			FileUtils.createParentDirectories(file);
-			file.createNewFile();
-		}
-
-		ImageIO.write(renderCutGroup(cutGroup), "png", file);
-
-		temporaryFiles.add(file);
 	}
 
 	private int printTable(Table table, int globalPageCounter) throws IOException {
@@ -843,30 +786,6 @@ public class PdfDataExporter implements DataExporter {
 		cuts.forEach((cut) -> lines.add(stringProvider.apply(cut)));
 
 		return lines;
-	}
-
-	/**
-	 * Delete all {@link File} previously added in the temporary file {@link List list}.
-	 * 
-	 * @param temporaryFolder
-	 *            Temporary folder used to store bar reference folder.
-	 */
-	private void cleanUpTemporaryFiles(File temporaryFolder) {
-		int total = temporaryFiles.size() + 1;
-
-		for (int index = 0; index < total - 1; index++) {
-			temporaryFiles.get(index).delete();
-
-			publishProgress(index, total);
-		}
-
-		try {
-			FileUtils.deleteDirectory(temporaryFolder);
-		} catch (IOException exception) {
-			log.warn("Could not delete temporary folder", exception);
-		}
-
-		publishProgress(total, total);
 	}
 
 	/**

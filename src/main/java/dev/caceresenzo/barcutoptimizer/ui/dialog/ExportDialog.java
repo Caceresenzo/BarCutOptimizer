@@ -21,6 +21,7 @@ import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
@@ -241,7 +242,7 @@ public class ExportDialog extends JDialog {
 			button.setEnabled(false);
 		}
 
-		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 	}
 
 	private void close() {
@@ -250,7 +251,7 @@ public class ExportDialog extends JDialog {
 
 	public static ExportDialog open(JFrame parent, List<BarReference> barReferences) {
 		ExportDialog dialog = new ExportDialog(parent, barReferences);
-		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
 
 		return dialog;
