@@ -1,5 +1,5 @@
 @ECHO off
 
-"%~DP0\start.cmd"
+CMD /c "%~DP0\start.cmd"
 
-pause;
+PAUSE
