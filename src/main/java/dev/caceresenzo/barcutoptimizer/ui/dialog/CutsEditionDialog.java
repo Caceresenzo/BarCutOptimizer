@@ -1,6 +1,5 @@
 package dev.caceresenzo.barcutoptimizer.ui.dialog;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.SystemColor;
@@ -93,9 +92,7 @@ public class CutsEditionDialog extends JDialog {
 		setResizable(true);
 		setLocationRelativeTo(null);
 		setTitle(I18n.string("cut-editor.frame.title"));
-		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-		getContentPane().add(contentPanel, BorderLayout.CENTER);
 
 		JScrollPane tableScrollPane = new JScrollPane();
 		tableScrollPane.setBorder(new TitledBorder(null, I18n.string("cut-editor.panel.data"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -113,24 +110,27 @@ public class CutsEditionDialog extends JDialog {
 		gl_contentPanel.setHorizontalGroup(
 			gl_contentPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPanel.createSequentialGroup()
-					.addComponent(tableScrollPane, GroupLayout.DEFAULT_SIZE, 387, Short.MAX_VALUE)
+					.addComponent(tableScrollPane, GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-						.addComponent(algorithmSettingsScrollPane, GroupLayout.DEFAULT_SIZE, 381, Short.MAX_VALUE)
-						.addComponent(barLengthPanel, GroupLayout.DEFAULT_SIZE, 381, Short.MAX_VALUE)
-						.addComponent(algorithmPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))));
+						.addComponent(barLengthPanel, GroupLayout.DEFAULT_SIZE, 433, Short.MAX_VALUE)
+						.addComponent(algorithmSettingsScrollPane, GroupLayout.DEFAULT_SIZE, 433, Short.MAX_VALUE)
+						.addComponent(algorithmPanel, GroupLayout.DEFAULT_SIZE, 433, Short.MAX_VALUE)))
+		);
 		gl_contentPanel.setVerticalGroup(
 			gl_contentPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPanel.createSequentialGroup()
 					.addGap(2)
 					.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-						.addComponent(tableScrollPane, GroupLayout.DEFAULT_SIZE, 402, Short.MAX_VALUE)
+						.addComponent(tableScrollPane, GroupLayout.PREFERRED_SIZE, 505, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_contentPanel.createSequentialGroup()
 							.addComponent(algorithmPanel, GroupLayout.PREFERRED_SIZE, 93, GroupLayout.PREFERRED_SIZE)
 							.addGap(8)
-							.addComponent(algorithmSettingsScrollPane, GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE)
+							.addComponent(algorithmSettingsScrollPane, GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(barLengthPanel, GroupLayout.PREFERRED_SIZE, 66, GroupLayout.PREFERRED_SIZE)))));
+							.addComponent(barLengthPanel, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap())
+		);
 
 		algorithmSettingsListPanel = new JPanel();
 		algorithmSettingsScrollPane.setViewportView(algorithmSettingsListPanel);
@@ -186,35 +186,40 @@ public class CutsEditionDialog extends JDialog {
 		table.getTableHeader().setReorderingAllowed(false);
 		tableScrollPane.setViewportView(table);
 		contentPanel.setLayout(gl_contentPanel);
-		JPanel buttonPane = new JPanel();
-		getContentPane().add(buttonPane, BorderLayout.SOUTH);
-		okButton = new JButton(I18n.string("cut-editor.button.ok"));
-		cancelButton = new JButton(I18n.string("cut-editor.button.cancel"));
-		getRootPane().setDefaultButton(okButton);
 
 		addLineButton = new JButton(I18n.string("cut-editor.button.add-new-line"));
 		addLineButton.setActionCommand("");
-		GroupLayout gl_buttonPane = new GroupLayout(buttonPane);
-		gl_buttonPane.setHorizontalGroup(
-			gl_buttonPane.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_buttonPane.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(addLineButton, GroupLayout.PREFERRED_SIZE, 146, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, 291, Short.MAX_VALUE)
-					.addComponent(okButton)
+		okButton = new JButton(I18n.string("cut-editor.button.ok"));
+		getRootPane().setDefaultButton(okButton);
+		cancelButton = new JButton(I18n.string("cut-editor.button.cancel"));
+		GroupLayout groupLayout = new GroupLayout(getContentPane());
+		groupLayout.setHorizontalGroup(
+			groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(groupLayout.createSequentialGroup()
+					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false)
+						.addGroup(groupLayout.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(addLineButton, GroupLayout.PREFERRED_SIZE, 230, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addComponent(okButton, GroupLayout.PREFERRED_SIZE, 102, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(cancelButton, GroupLayout.PREFERRED_SIZE, 95, GroupLayout.PREFERRED_SIZE))
+						.addComponent(contentPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap())
+		);
+		groupLayout.setVerticalGroup(
+			groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(groupLayout.createSequentialGroup()
+					.addComponent(contentPanel, GroupLayout.PREFERRED_SIZE, 509, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(cancelButton)
-					.addContainerGap()));
-		gl_buttonPane.setVerticalGroup(
-			gl_buttonPane.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_buttonPane.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_buttonPane.createParallelGroup(Alignment.BASELINE)
-						.addComponent(cancelButton)
-						.addComponent(okButton)
-						.addComponent(addLineButton))
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
-		buttonPane.setLayout(gl_buttonPane);
+					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+						.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+							.addComponent(okButton, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+							.addComponent(addLineButton, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE))
+						.addComponent(cancelButton, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap())
+		);
+		getContentPane().setLayout(groupLayout);
 
 		initializeButtons();
 		initializeComboBoxes();
