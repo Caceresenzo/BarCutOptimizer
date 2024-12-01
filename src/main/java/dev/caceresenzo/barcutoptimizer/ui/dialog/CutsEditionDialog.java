@@ -2,6 +2,7 @@ package dev.caceresenzo.barcutoptimizer.ui.dialog;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.GridLayout;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,7 +13,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
-import javax.swing.BoxLayout;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
@@ -50,6 +50,7 @@ import dev.caceresenzo.barcutoptimizer.optimize.AlgorithmManager;
 import dev.caceresenzo.barcutoptimizer.optimize.AlgorithmManager.AlgorithmSettingEntry;
 import dev.caceresenzo.barcutoptimizer.optimize.CutAlgorithm;
 import dev.caceresenzo.barcutoptimizer.ui.component.AlgorithmSettingPanel;
+import net.miginfocom.swing.MigLayout;
 
 @SuppressWarnings("serial")
 public class CutsEditionDialog extends JDialog {
@@ -108,35 +109,34 @@ public class CutsEditionDialog extends JDialog {
 
 		GroupLayout gl_contentPanel = new GroupLayout(contentPanel);
 		gl_contentPanel.setHorizontalGroup(
-			gl_contentPanel.createParallelGroup(Alignment.LEADING)
+			gl_contentPanel.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_contentPanel.createSequentialGroup()
-					.addComponent(tableScrollPane, GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE)
+					.addComponent(tableScrollPane, GroupLayout.DEFAULT_SIZE, 422, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-						.addComponent(barLengthPanel, GroupLayout.DEFAULT_SIZE, 433, Short.MAX_VALUE)
-						.addComponent(algorithmSettingsScrollPane, GroupLayout.DEFAULT_SIZE, 433, Short.MAX_VALUE)
-						.addComponent(algorithmPanel, GroupLayout.DEFAULT_SIZE, 433, Short.MAX_VALUE)))
+					.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
+						.addComponent(barLengthPanel, GroupLayout.PREFERRED_SIZE, 433, GroupLayout.PREFERRED_SIZE)
+						.addComponent(algorithmPanel, GroupLayout.PREFERRED_SIZE, 433, GroupLayout.PREFERRED_SIZE)
+						.addComponent(algorithmSettingsScrollPane, GroupLayout.DEFAULT_SIZE, 433, Short.MAX_VALUE)))
 		);
 		gl_contentPanel.setVerticalGroup(
-			gl_contentPanel.createParallelGroup(Alignment.LEADING)
+			gl_contentPanel.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_contentPanel.createSequentialGroup()
-					.addGap(2)
-					.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-						.addComponent(tableScrollPane, GroupLayout.PREFERRED_SIZE, 505, GroupLayout.PREFERRED_SIZE)
+					.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
+						.addComponent(tableScrollPane, GroupLayout.DEFAULT_SIZE, 495, Short.MAX_VALUE)
 						.addGroup(gl_contentPanel.createSequentialGroup()
-							.addComponent(algorithmPanel, GroupLayout.PREFERRED_SIZE, 93, GroupLayout.PREFERRED_SIZE)
-							.addGap(8)
-							.addComponent(algorithmSettingsScrollPane, GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE)
+							.addComponent(algorithmPanel, GroupLayout.PREFERRED_SIZE, 84, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(algorithmSettingsScrollPane, GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(barLengthPanel, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap())
+					.addGap(0))
 		);
 
 		algorithmSettingsListPanel = new JPanel();
 		algorithmSettingsScrollPane.setViewportView(algorithmSettingsListPanel);
+		algorithmSettingsListPanel.setLayout(new MigLayout("flowy", "[grow,fill]", "[fill]"));
 		algorithmSettingsScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		algorithmSettingsScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		algorithmSettingsListPanel.setLayout(new BoxLayout(algorithmSettingsListPanel, BoxLayout.Y_AXIS));
 
 		barLengthTextField = new JTextField();
 		barLengthTextField.setColumns(10);
@@ -189,36 +189,37 @@ public class CutsEditionDialog extends JDialog {
 
 		addLineButton = new JButton(I18n.string("cut-editor.button.add-new-line"));
 		addLineButton.setActionCommand("");
-		okButton = new JButton(I18n.string("cut-editor.button.ok"));
-		getRootPane().setDefaultButton(okButton);
-		cancelButton = new JButton(I18n.string("cut-editor.button.cancel"));
+
+		JPanel panel = new JPanel();
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false)
+			groupLayout.createParallelGroup(Alignment.TRAILING)
+				.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addComponent(contentPanel, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 875, Short.MAX_VALUE)
 						.addGroup(groupLayout.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(addLineButton, GroupLayout.PREFERRED_SIZE, 230, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-							.addComponent(okButton, GroupLayout.PREFERRED_SIZE, 102, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(cancelButton, GroupLayout.PREFERRED_SIZE, 95, GroupLayout.PREFERRED_SIZE))
-						.addComponent(contentPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+							.addComponent(addLineButton, GroupLayout.PREFERRED_SIZE, 187, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED, 474, Short.MAX_VALUE)
+							.addComponent(panel, GroupLayout.PREFERRED_SIZE, 209, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
+			groupLayout.createParallelGroup(Alignment.TRAILING)
 				.addGroup(groupLayout.createSequentialGroup()
-					.addComponent(contentPanel, GroupLayout.PREFERRED_SIZE, 509, GroupLayout.PREFERRED_SIZE)
+					.addComponent(contentPanel, GroupLayout.DEFAULT_SIZE, 505, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-						.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-							.addComponent(okButton, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
-							.addComponent(addLineButton, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE))
-						.addComponent(cancelButton, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE))
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
+						.addComponent(panel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(addLineButton, GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE))
 					.addContainerGap())
 		);
+		okButton = new JButton(I18n.string("cut-editor.button.ok"));
+		getRootPane().setDefaultButton(okButton);
+		cancelButton = new JButton(I18n.string("cut-editor.button.cancel"));
+		panel.setLayout(new GridLayout(0, 2, 8, 0));
+		panel.add(okButton);
+		panel.add(cancelButton);
 		getContentPane().setLayout(groupLayout);
 
 		initializeButtons();
