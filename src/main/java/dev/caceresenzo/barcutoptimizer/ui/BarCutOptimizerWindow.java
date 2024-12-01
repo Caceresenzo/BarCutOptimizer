@@ -9,7 +9,6 @@ import javax.swing.UIManager;
 import dev.caceresenzo.barcutoptimizer.model.BarReference;
 import dev.caceresenzo.barcutoptimizer.ui.other.ImportDialogs;
 import dev.caceresenzo.barcutoptimizer.ui.window.EditorWindow;
-import dev.caceresenzo.barcutoptimizer.ui.window.StartWindow;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -25,6 +24,9 @@ public class BarCutOptimizerWindow {
 	public void initialize() {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
+			UIManager.getLookAndFeelDefaults().put("Tree.background", UIManager.getColor("Button.background"));
+			UIManager.getLookAndFeelDefaults().put("Tree.textBackground", UIManager.getColor("Button.background"));
 		} catch (Exception exception) {
 			exception.printStackTrace();
 		}
