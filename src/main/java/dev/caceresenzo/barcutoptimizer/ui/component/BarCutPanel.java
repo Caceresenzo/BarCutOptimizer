@@ -110,8 +110,8 @@ public class BarCutPanel extends JPanel {
 			Rectangle2D stringBound = graphics2d.getFontMetrics().getStringBounds(lengthText, null);
 			graphics2d.drawString(
 				lengthText,
-				((x2 - x1) / 2) - ((int) stringBound.getWidth() / 2) + x1,
-				((int) stringBound.getHeight() + maxHeight) / 2
+				((width) / 2) - ((int) stringBound.getWidth() / 2) + x1,
+				((int) stringBound.getHeight() + maxHeight) / 2 - 1
 			);
 
 			if (!isLast) {
