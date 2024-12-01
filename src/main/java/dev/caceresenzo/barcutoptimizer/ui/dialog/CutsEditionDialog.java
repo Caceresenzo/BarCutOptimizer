@@ -248,6 +248,12 @@ public class CutsEditionDialog extends JDialog {
 		});
 
 		pack();
+
+		SwingUtilities.invokeLater(() -> {
+			if (barReference.isEmpty()) {
+				newItem();
+			}
+		});
 	}
 
 	private void initializeButtons() {
@@ -255,8 +261,7 @@ public class CutsEditionDialog extends JDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				((CutTableInputTableModel) table.getModel()).addNewEmptyItem();
-				table.repaint();
+				newItem();
 			}
 
 		});
@@ -359,6 +364,11 @@ public class CutsEditionDialog extends JDialog {
 		});
 
 		barLengthTextField.setText(String.valueOf(initialValue));
+	}
+
+	private void newItem() {
+		((CutTableInputTableModel) table.getModel()).addNewEmptyItem();
+		table.repaint();
 	}
 
 	private void onAlgorithmSelected(CutAlgorithm cutAlgorithm) {
