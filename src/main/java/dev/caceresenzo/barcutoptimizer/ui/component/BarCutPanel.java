@@ -7,14 +7,14 @@ import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 import javax.swing.JPanel;
-import javax.swing.border.TitledBorder;
+import javax.swing.border.LineBorder;
 
 import dev.caceresenzo.barcutoptimizer.model.Cut;
 import dev.caceresenzo.barcutoptimizer.model.CutGroup;
 
 @SuppressWarnings("serial")
 public class BarCutPanel extends JPanel {
-	
+
 	public static final Color RED = Color.decode("#ff4300");
 	public static final Color BLUE = Color.decode("#00f3ff");
 	public static final Color GREEN = Color.decode("#00ff42");
@@ -25,7 +25,7 @@ public class BarCutPanel extends JPanel {
 	 * Create the panel.
 	 */
 	public BarCutPanel(CutGroup cutGroup) {
-		setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		setBorder(new LineBorder(new Color(255, 255, 255)));
 		this.cutGroup = cutGroup;
 	}
 

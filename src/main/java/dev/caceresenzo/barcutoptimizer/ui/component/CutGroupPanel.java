@@ -1,5 +1,6 @@
 package dev.caceresenzo.barcutoptimizer.ui.component;
 
+import java.awt.Color;
 import java.awt.Font;
 
 import javax.swing.GroupLayout;
@@ -23,7 +24,7 @@ public class CutGroupPanel extends JPanel {
 	public CutGroupPanel(CutGroup cutGroup) {
 		this.cutGroup = cutGroup;
 
-		setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), I18n.string("editor.list.item.cut.title"), TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		setSize(250, 110);
 		setBackground(UIManager.getColor("Tree.textBackground"));
 

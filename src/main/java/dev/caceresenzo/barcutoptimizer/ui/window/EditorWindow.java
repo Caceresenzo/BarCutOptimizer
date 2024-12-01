@@ -9,7 +9,6 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
@@ -24,6 +23,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.UIManager;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -48,8 +49,7 @@ import dev.caceresenzo.barcutoptimizer.ui.dialog.ExportDialog;
 import dev.caceresenzo.barcutoptimizer.ui.other.ImportDialogs;
 import dev.caceresenzo.barcutoptimizer.ui.other.NewBarReferenceDialogs;
 import lombok.Getter;
-import javax.swing.border.TitledBorder;
-import javax.swing.UIManager;
+import net.miginfocom.swing.MigLayout;
 
 @SuppressWarnings("serial")
 public class EditorWindow {
@@ -137,7 +137,7 @@ public class EditorWindow {
 
 		cutGroupListContainerPanel = new JPanel();
 		cutGroupListScrollPanel.setViewportView(cutGroupListContainerPanel);
-		cutGroupListContainerPanel.setLayout(new BoxLayout(cutGroupListContainerPanel, BoxLayout.Y_AXIS));
+		cutGroupListContainerPanel.setLayout(new MigLayout("flowy", "[grow,fill]", "[fill]"));
 
 		cutGroupListScrollPanel.getVerticalScrollBar().setUnitIncrement(20);
 
@@ -211,7 +211,7 @@ public class EditorWindow {
 			};
 
 		});
-		
+
 		tree.addMouseListener(new MouseAdapter() {
 
 			public void mouseClicked(MouseEvent event) {
