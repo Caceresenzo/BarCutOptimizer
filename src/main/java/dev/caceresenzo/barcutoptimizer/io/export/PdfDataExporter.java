@@ -15,15 +15,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
-import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
-import org.apache.commons.io.FileSystem;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -33,7 +30,6 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
-import dev.caceresenzo.barcutoptimizer.BarCutOptimizer;
 import dev.caceresenzo.barcutoptimizer.constant.Assets;
 import dev.caceresenzo.barcutoptimizer.constant.Defaults;
 import dev.caceresenzo.barcutoptimizer.language.I18n;
@@ -185,7 +181,7 @@ public class PdfDataExporter implements DataExporter {
 							/* Printing the remaining bar length */
 							printSimpleHorizontalLine(contentStream, startX, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, (inversedY - usedY));
 							printSimpleHorizontalLine(contentStream, startX, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, (inversedY - (FONT_SIZE * 1.4f) - usedY));
-							printSimpleText(contentStream, startX, (inversedY - FONT_SIZE - usedY), FONT_SIZE, "CHUTE");
+							printSimpleText(contentStream, startX, (inversedY - FONT_SIZE - usedY), FONT_SIZE, I18n.string("exporter.word.leftover"));
 
 							String barLengthString = String.valueOf(cutGroup.getRemainingBarLength());
 							if (cutGroup.isRemainingBarLengthUnknown()) {

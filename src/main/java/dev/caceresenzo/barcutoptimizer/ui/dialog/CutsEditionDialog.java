@@ -113,10 +113,10 @@ public class CutsEditionDialog extends JDialog {
 				.addGroup(gl_contentPanel.createSequentialGroup()
 					.addComponent(tableScrollPane, GroupLayout.DEFAULT_SIZE, 422, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
+					.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING, false)
 						.addComponent(barLengthPanel, GroupLayout.PREFERRED_SIZE, 433, GroupLayout.PREFERRED_SIZE)
 						.addComponent(algorithmPanel, GroupLayout.PREFERRED_SIZE, 433, GroupLayout.PREFERRED_SIZE)
-						.addComponent(algorithmSettingsScrollPane, GroupLayout.DEFAULT_SIZE, 433, Short.MAX_VALUE)))
+						.addComponent(algorithmSettingsScrollPane, GroupLayout.PREFERRED_SIZE, 433, GroupLayout.PREFERRED_SIZE)))
 		);
 		gl_contentPanel.setVerticalGroup(
 			gl_contentPanel.createParallelGroup(Alignment.TRAILING)
