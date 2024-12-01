@@ -48,6 +48,8 @@ import dev.caceresenzo.barcutoptimizer.ui.dialog.ExportDialog;
 import dev.caceresenzo.barcutoptimizer.ui.other.ImportDialogs;
 import dev.caceresenzo.barcutoptimizer.ui.other.NewBarReferenceDialogs;
 import lombok.Getter;
+import javax.swing.border.TitledBorder;
+import javax.swing.UIManager;
 
 @SuppressWarnings("serial")
 public class EditorWindow {
@@ -90,9 +92,11 @@ public class EditorWindow {
 		frame.setTitle(I18n.string("application.title", Defaults.VERSION));
 
 		JScrollPane treeScrollPanel = new JScrollPane();
+		treeScrollPanel.setBorder(new TitledBorder(null, I18n.string("editor.panel.tree"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		treeScrollPanel.setViewportBorder(null);
 
 		cutGroupListScrollPanel = new JScrollPane();
+		cutGroupListScrollPanel.setBorder(new TitledBorder(null, I18n.string("editor.panel.cuts"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
 		addNewBarReferenceButton = new JButton(I18n.string("editor.button.add-new-bar-reference"));
 
@@ -105,16 +109,15 @@ public class EditorWindow {
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addComponent(addNewBarReferenceButton, GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE)
+						.addComponent(treeScrollPanel, GroupLayout.PREFERRED_SIZE, 247, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(addNewBarReferenceButton, GroupLayout.PREFERRED_SIZE, 247, GroupLayout.PREFERRED_SIZE)
+							.addComponent(editCutsButton, GroupLayout.DEFAULT_SIZE, 491, Short.MAX_VALUE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(editCutsButton, GroupLayout.DEFAULT_SIZE, 399, Short.MAX_VALUE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(exportButton, GroupLayout.DEFAULT_SIZE, 374, Short.MAX_VALUE))
-						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(treeScrollPanel, GroupLayout.PREFERRED_SIZE, 247, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(cutGroupListScrollPanel, GroupLayout.DEFAULT_SIZE, 778, Short.MAX_VALUE)))
+							.addComponent(exportButton, GroupLayout.DEFAULT_SIZE, 384, Short.MAX_VALUE))
+						.addComponent(cutGroupListScrollPanel, GroupLayout.DEFAULT_SIZE, 880, Short.MAX_VALUE))
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
@@ -122,13 +125,13 @@ public class EditorWindow {
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(cutGroupListScrollPanel, GroupLayout.DEFAULT_SIZE, 416, Short.MAX_VALUE)
+						.addComponent(cutGroupListScrollPanel, GroupLayout.DEFAULT_SIZE, 428, Short.MAX_VALUE)
 						.addComponent(treeScrollPanel, GroupLayout.DEFAULT_SIZE, 428, Short.MAX_VALUE))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-						.addComponent(addNewBarReferenceButton, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE)
-						.addComponent(editCutsButton, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
-						.addComponent(exportButton, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE))
+					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+						.addComponent(editCutsButton, GroupLayout.DEFAULT_SIZE, 48, Short.MAX_VALUE)
+						.addComponent(exportButton, GroupLayout.DEFAULT_SIZE, 48, Short.MAX_VALUE)
+						.addComponent(addNewBarReferenceButton, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE))
 					.addContainerGap())
 		);
 
@@ -140,6 +143,7 @@ public class EditorWindow {
 
 		rootNode = new DefaultMutableTreeNode(I18n.string("editor.tree.root"));
 		tree = new JTree(rootNode);
+		tree.setBackground(UIManager.getColor("Button.background"));
 		tree.setBorder(null);
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		treeScrollPanel.setViewportView(tree);
@@ -207,6 +211,7 @@ public class EditorWindow {
 			};
 
 		});
+		
 		tree.addMouseListener(new MouseAdapter() {
 
 			public void mouseClicked(MouseEvent event) {
@@ -243,7 +248,7 @@ public class EditorWindow {
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
 				Object userObject = node.getUserObject();
 
-				if (userObject instanceof CutGroup || userObject instanceof BarReference) {
+				if (userObject instanceof BarReference) {
 					return;
 				}
 
