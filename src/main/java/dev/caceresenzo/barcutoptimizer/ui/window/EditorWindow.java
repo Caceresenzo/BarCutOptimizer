@@ -128,9 +128,9 @@ public class EditorWindow {
 						.addComponent(treeScrollPanel, GroupLayout.DEFAULT_SIZE, 428, Short.MAX_VALUE)
 						.addComponent(cutGroupListScrollPanel, GroupLayout.DEFAULT_SIZE, 428, Short.MAX_VALUE))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-						.addComponent(editCutsButton, GroupLayout.DEFAULT_SIZE, 48, Short.MAX_VALUE)
-						.addComponent(exportButton, GroupLayout.DEFAULT_SIZE, 48, Short.MAX_VALUE)
+					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false)
+						.addComponent(editCutsButton, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
+						.addComponent(exportButton, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
 						.addComponent(addNewBarReferenceButton, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE))
 					.addContainerGap())
 		);
