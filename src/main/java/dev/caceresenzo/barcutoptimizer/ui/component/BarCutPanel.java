@@ -15,6 +15,7 @@ import dev.caceresenzo.barcutoptimizer.model.CutGroup;
 @SuppressWarnings("serial")
 public class BarCutPanel extends JPanel {
 	
+	public static final Color RED = Color.decode("#ff4300");
 	public static final Color BLUE = Color.decode("#00f3ff");
 	public static final Color GREEN = Color.decode("#00ff42");
 
@@ -45,7 +46,7 @@ public class BarCutPanel extends JPanel {
 
 		double widthRatio = maxWidth / cutGroup.getBarLength();
 
-		graphics2d.setColor(Color.RED);
+		graphics2d.setColor(RED);
 		graphics2d.fillRect(startX, startY, maxWidth - startX, maxHeight - startY);
 
 		List<Cut> cuts = cutGroup.getCuts();
