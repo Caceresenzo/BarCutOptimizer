@@ -267,6 +267,8 @@ public class EditorWindow {
 				barReferences.add(barReference);
 				createTreeNodes();
 				reloadTreeNode(null);
+
+				displayBarReference(barReference);
 			}
 
 		});
