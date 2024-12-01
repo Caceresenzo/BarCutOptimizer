@@ -307,25 +307,7 @@ public class EditorWindow {
 		rootNode.removeAllChildren();
 
 		for (BarReference barReference : barReferences) {
-			DefaultMutableTreeNode barReferenceNode = new DefaultMutableTreeNode(barReference);
-
-			if (Defaults.SHOW_CUT_GROUPS_IN_EDITOR_TREE) {
-				for (CutGroup cutGroup : barReference.getCutGroups()) {
-					DefaultMutableTreeNode cutGroupNode = new DefaultMutableTreeNode(cutGroup);
-
-					if (Defaults.SHOW_CUTS_IN_EDITOR_TREE) {
-						for (Cut cut : cutGroup.getCuts()) {
-							DefaultMutableTreeNode cutNode = new DefaultMutableTreeNode(cut);
-
-							cutGroupNode.add(cutNode);
-						}
-					}
-
-					barReferenceNode.add(cutGroupNode);
-				}
-			}
-
-			rootNode.add(barReferenceNode);
+			rootNode.add(new DefaultMutableTreeNode(barReference));
 		}
 	}
 
@@ -349,11 +331,6 @@ public class EditorWindow {
 		clearDisplaySection();
 
 		Object userObject = defaultMutableTreeNode.getUserObject();
-
-		if (userObject instanceof CutGroup) {
-			userObject = ((DefaultMutableTreeNode) defaultMutableTreeNode.getParent()).getUserObject();
-		}
-
 		if (userObject instanceof BarReference) {
 			displayBarReference((BarReference) userObject);
 		}
