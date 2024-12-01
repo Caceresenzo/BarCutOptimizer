@@ -67,7 +67,12 @@ public class CutGroupPanel extends JPanel {
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("<html>");
 		String format = "%-10s %7s / %-5s <br/>";
-		stringBuilder.append(String.format(format, "LENGTH", "ANGLE A", "ANGLE B"));
+		stringBuilder.append(String.format(
+			format,
+			I18n.string("cut-editor.panel.data.table.header.column.length"),
+			I18n.string("cut-editor.panel.data.table.header.column.angle-a"),
+			I18n.string("cut-editor.panel.data.table.header.column.angle-b")
+		));
 		cutGroup.getCuts().forEach((cut) -> stringBuilder.append(String.format(format, cut.getLength(), cut.formatLeftAngle(), cut.formatRightAngle())));
 		stringBuilder.append("</html>");
 
