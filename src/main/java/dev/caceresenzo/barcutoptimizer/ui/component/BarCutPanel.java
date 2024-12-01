@@ -14,6 +14,9 @@ import dev.caceresenzo.barcutoptimizer.model.CutGroup;
 
 @SuppressWarnings("serial")
 public class BarCutPanel extends JPanel {
+	
+	public static final Color BLUE = Color.decode("#00f3ff");
+	public static final Color GREEN = Color.decode("#00ff42");
 
 	private final CutGroup cutGroup;
 
@@ -70,7 +73,7 @@ public class BarCutPanel extends JPanel {
 			int height = maxHeight - startY;
 			int width = x2 - x1;
 
-			graphics2d.setColor(index % 2 == 0 ? Color.GRAY : Color.LIGHT_GRAY);
+			graphics2d.setColor(index % 2 == 0 ? BLUE : GREEN);
 
 			Slope leftSlope = new Slope(cut.getLeftAngle(), startY, maxHeight, width, height);
 			if (leftSlope.yPoints != null) {
